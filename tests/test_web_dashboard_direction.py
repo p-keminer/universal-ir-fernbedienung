@@ -66,9 +66,17 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "return confirm",
             "appendCategoryFilter",
             "appendDashboardScript",
-            "commandCount()",
         ):
             self.assertIn(expected, dashboard)
+
+        for removed in (
+            "class='stats'",
+            "<strong>Profile</strong>",
+            "<strong>Befehle</strong>",
+            "<strong>Status</strong><span>Test</span>",
+            "config::kWifiApSsid;\n    html += F(\" / http://\");",
+        ):
+            self.assertNotIn(removed, dashboard)
 
     def test_docs_describe_dashboard_as_default_and_hardware_as_minimal(self):
         readme = read_text("README.md")

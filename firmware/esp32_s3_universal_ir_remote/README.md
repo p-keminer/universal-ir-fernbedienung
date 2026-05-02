@@ -41,7 +41,6 @@ Taster, Joystick und LCD1602 sind nicht Teil des v1-Defaults.
 - Suche ueber Profil- und Befehlsnamen
 - Kategorienfilter fuer TV, Media, LED Strip, Projektor, Audio und Test
 - Status-/Protokoll-Tags pro Befehl
-- Zaehler fuer Profile und Befehle
 - Diagnostic Sweep mit Bestaetigungsdialog
 
 ## Routen
