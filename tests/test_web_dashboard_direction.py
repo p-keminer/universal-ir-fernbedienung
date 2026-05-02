@@ -9,6 +9,11 @@ def read_text(relative_path):
     return (ROOT / relative_path).read_text(encoding="utf-8")
 
 
+def profile_block(catalog, profile_id):
+    marker = f"{{ProfileId::{profile_id},"
+    return [line for line in catalog.splitlines() if marker in line]
+
+
 class WebDashboardDirectionTest(unittest.TestCase):
     def test_sketch_defaults_to_web_dashboard(self):
         sketch = read_text(
@@ -127,6 +132,65 @@ class WebDashboardDirectionTest(unittest.TestCase):
         self.assertIn("IR-Sendepfad bleibt Pflicht", hardware)
         self.assertIn("Taster", future)
         self.assertIn("LCD1602", future)
+
+    def test_catalog_contains_researched_tv_code_expansions(self):
+        catalog = read_text(
+            "firmware/esp32_s3_universal_ir_remote/ir_catalog/IrCatalog.h"
+        )
+        research = read_text("docs/IR_CODE_RESEARCH.md")
+
+        expected_commands = {
+            "PanasonicTv": (
+                "Vol +",
+                "Vol -",
+                "Mute",
+                "Ch +",
+                "Ch -",
+                "Input",
+                "Menu",
+                "Up",
+                "Down",
+                "Left",
+                "Right",
+                "Enter",
+                "HDMI 1",
+            ),
+            "PhilipsTv": (
+                "Vol +",
+                "Vol -",
+                "Mute",
+                "Ch +",
+                "Ch -",
+                "Input",
+                "Menu",
+                "Up",
+                "Down",
+                "Left",
+                "Right",
+            ),
+            "Sharp": (
+                "Vol +",
+                "Vol -",
+                "Mute",
+                "Ch +",
+                "Ch -",
+                "Input",
+                "Menu",
+                "Info",
+            ),
+        }
+
+        for profile_id, command_names in expected_commands.items():
+            block = "\n".join(profile_block(catalog, profile_id))
+            for command_name in command_names:
+                self.assertIn(f'"{command_name}"', block)
+
+        self.assertIn("panasonicIrdb", catalog)
+        self.assertIn("rc5Irdb", catalog)
+        self.assertIn("sharpIrdb", catalog)
+        self.assertIn("TCL/Hisense", research)
+        self.assertIn("RCA-38", research)
+        self.assertIn("noch nicht vom Sender unterstuetzt", research)
 
 
 if __name__ == "__main__":

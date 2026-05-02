@@ -99,8 +99,29 @@ constexpr uint32_t necIrdb(const uint8_t device, const int16_t subdevice,
          (static_cast<uint32_t>(fn) << 8) | static_cast<uint8_t>(~fn);
 }
 
+constexpr uint32_t panasonicIrdb(const uint8_t device, const uint8_t subdevice,
+                                 const uint8_t function) {
+  const uint8_t dev = reverse8(device);
+  const uint8_t sub = reverse8(subdevice);
+  const uint8_t fn = reverse8(function);
+  const uint8_t checksum = dev ^ sub ^ fn;
+
+  return (static_cast<uint32_t>(dev) << 24) |
+         (static_cast<uint32_t>(sub) << 16) |
+         (static_cast<uint32_t>(fn) << 8) | checksum;
+}
+
+constexpr uint16_t rc5Irdb(const uint8_t device, const uint8_t function) {
+  return (static_cast<uint16_t>(device & 0x1F) << 6) | (function & 0x3F);
+}
+
 constexpr uint16_t sony12Irdb(const uint8_t device, const uint8_t function) {
   return reverseBits((static_cast<uint16_t>(device) << 7) | function, 12);
+}
+
+constexpr uint16_t sharpIrdb(const uint8_t address, const uint8_t command) {
+  return (reverseBits(address, 5) << 10) | (reverseBits(command, 8) << 2) |
+         0x02;
 }
 
 static constexpr IrProfile kProfiles[] = {
@@ -240,11 +261,96 @@ static constexpr IrCommand kCommands[] = {
      "IRDB Sony TV 1,-1 f=58"},
 
     {ProfileId::PanasonicTv, "Power", DeviceCategory::Tv,
-     IrProtocol::Panasonic, CodeStatus::Untested, 0x0100BCBD, 0x4004, 32, true,
-     "Panasonic address/data power"},
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 61),
+     0x4004, 32, true, "IRDB Panasonic TV 128,0 f=61"},
+    {ProfileId::PanasonicTv, "Vol +", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 32),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=32"},
+    {ProfileId::PanasonicTv, "Vol -", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 33),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=33"},
+    {ProfileId::PanasonicTv, "Mute", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 50),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=50"},
+    {ProfileId::PanasonicTv, "Ch +", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 52),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=52"},
+    {ProfileId::PanasonicTv, "Ch -", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 53),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=53"},
+    {ProfileId::PanasonicTv, "Input", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 5),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=5"},
+    {ProfileId::PanasonicTv, "Menu", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 82),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=82"},
+    {ProfileId::PanasonicTv, "Info", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 57),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=57"},
+    {ProfileId::PanasonicTv, "Up", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 74),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=74"},
+    {ProfileId::PanasonicTv, "Down", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 75),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=75"},
+    {ProfileId::PanasonicTv, "Left", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 78),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=78"},
+    {ProfileId::PanasonicTv, "Right", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 79),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=79"},
+    {ProfileId::PanasonicTv, "Enter", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 0, 73),
+     0x4004, 32, false, "IRDB Panasonic TV 128,0 f=73"},
+    {ProfileId::PanasonicTv, "HDMI 1", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 4, 176),
+     0x4004, 32, false, "IRDB Panasonic TV 128,4 f=176"},
+    {ProfileId::PanasonicTv, "HDMI 2", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 4, 177),
+     0x4004, 32, false, "IRDB Panasonic TV 128,4 f=177"},
+    {ProfileId::PanasonicTv, "Home", DeviceCategory::Tv,
+     IrProtocol::Panasonic, CodeStatus::Untested, panasonicIrdb(128, 9, 149),
+     0x4004, 32, false, "IRDB Panasonic TV 128,9 f=149"},
 
     {ProfileId::PhilipsTv, "Power", DeviceCategory::Tv, IrProtocol::Rc5,
-     CodeStatus::Untested, 0x0C, 0, 12, true, "Philips RC5 power"},
+     CodeStatus::Untested, rc5Irdb(0, 12), 0, 12, true,
+     "IRDB Philips TV RC5 0,-1 f=12"},
+    {ProfileId::PhilipsTv, "Vol +", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 16), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=16"},
+    {ProfileId::PhilipsTv, "Vol -", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 17), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=17"},
+    {ProfileId::PhilipsTv, "Mute", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 13), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=13"},
+    {ProfileId::PhilipsTv, "Ch +", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 32), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=32"},
+    {ProfileId::PhilipsTv, "Ch -", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 33), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=33"},
+    {ProfileId::PhilipsTv, "Input", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 56), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=56"},
+    {ProfileId::PhilipsTv, "Menu", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 46), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=46"},
+    {ProfileId::PhilipsTv, "Exit", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 15), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=15"},
+    {ProfileId::PhilipsTv, "Up", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 28), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=28"},
+    {ProfileId::PhilipsTv, "Down", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 29), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=29"},
+    {ProfileId::PhilipsTv, "Left", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 44), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=44"},
+    {ProfileId::PhilipsTv, "Right", DeviceCategory::Tv, IrProtocol::Rc5,
+     CodeStatus::Untested, rc5Irdb(0, 43), 0, 12, false,
+     "IRDB Philips TV RC5 0,-1 f=43"},
 
     {ProfileId::GenericNec, "Power A", DeviceCategory::GenericTest,
      IrProtocol::Nec, CodeStatus::Untested, 0x10EFC03F, 0, 32, true,
@@ -316,7 +422,35 @@ static constexpr IrCommand kCommands[] = {
      CodeStatus::Untested, 0xC2A4, 0, 16, true, "JVC test code"},
 
     {ProfileId::Sharp, "Power", DeviceCategory::Tv, IrProtocol::SharpRaw,
-     CodeStatus::Untested, 0x42AD, 0, 15, true, "Sharp raw 15-bit test"},
+     CodeStatus::Untested, sharpIrdb(1, 22), 0, 15, true,
+     "IRDB Sharp TV 1,-1 f=22"},
+    {ProfileId::Sharp, "Vol +", DeviceCategory::Tv, IrProtocol::SharpRaw,
+     CodeStatus::Untested, sharpIrdb(1, 20), 0, 15, false,
+     "IRDB Sharp TV 1,-1 f=20"},
+    {ProfileId::Sharp, "Vol -", DeviceCategory::Tv, IrProtocol::SharpRaw,
+     CodeStatus::Untested, sharpIrdb(1, 21), 0, 15, false,
+     "IRDB Sharp TV 1,-1 f=21"},
+    {ProfileId::Sharp, "Mute", DeviceCategory::Tv, IrProtocol::SharpRaw,
+     CodeStatus::Untested, sharpIrdb(1, 23), 0, 15, false,
+     "IRDB Sharp TV 1,-1 f=23"},
+    {ProfileId::Sharp, "Ch +", DeviceCategory::Tv, IrProtocol::SharpRaw,
+     CodeStatus::Untested, sharpIrdb(1, 17), 0, 15, false,
+     "IRDB Sharp TV 1,-1 f=17"},
+    {ProfileId::Sharp, "Ch -", DeviceCategory::Tv, IrProtocol::SharpRaw,
+     CodeStatus::Untested, sharpIrdb(1, 18), 0, 15, false,
+     "IRDB Sharp TV 1,-1 f=18"},
+    {ProfileId::Sharp, "Input", DeviceCategory::Tv, IrProtocol::SharpRaw,
+     CodeStatus::Untested, sharpIrdb(1, 19), 0, 15, false,
+     "IRDB Sharp TV 1,-1 f=19"},
+    {ProfileId::Sharp, "Menu", DeviceCategory::Tv, IrProtocol::SharpRaw,
+     CodeStatus::Untested, sharpIrdb(1, 32), 0, 15, false,
+     "IRDB Sharp TV 1,-1 f=32"},
+    {ProfileId::Sharp, "Info", DeviceCategory::Tv, IrProtocol::SharpRaw,
+     CodeStatus::Untested, sharpIrdb(1, 27), 0, 15, false,
+     "IRDB Sharp TV 1,-1 f=27"},
+    {ProfileId::Sharp, "Return", DeviceCategory::Tv, IrProtocol::SharpRaw,
+     CodeStatus::Untested, sharpIrdb(1, 47), 0, 15, false,
+     "IRDB Sharp TV 1,-1 f=47"},
 
     {ProfileId::AppleTv, "Play/Pause", DeviceCategory::Media, IrProtocol::Nec,
      CodeStatus::Untested, 0xEE8704FB, 0, 32, false, "Apple TV play/pause"},

@@ -13,7 +13,7 @@ Der aktive Katalog steht in:
 firmware/esp32_s3_universal_ir_remote/ir_catalog/IrCatalog.h
 ```
 
-Aktueller Stand: `16` Profile und `104` Befehle.
+Aktueller Stand: `16` Profile und `141` Befehle.
 
 Profile:
 
@@ -48,7 +48,18 @@ Ein Code wird erst nach realem Test auf `Confirmed` oder `Rejected` gesetzt.
 
 Ein Teil der neuen Kandidaten basiert auf ausgewaehlten IRDB-Zeilen.
 IRDB speichert Codes als `protocol, device, subdevice, function`.
-Die Firmware wandelt diese Werte fuer NEC-/Samsung- und Sony12-basierte Befehle in die von `IRremoteESP8266` erwartete Sendedarstellung um.
+Die Firmware wandelt diese Werte fuer NEC-/Samsung-, Sony12-, Panasonic-, RC5- und Sharp-basierte Befehle in die von `IRremoteESP8266` erwartete Sendedarstellung um.
+
+## Nachgetragene TV-Kandidaten
+
+| Profil | Quelle | Status |
+| --- | --- | --- |
+| Panasonic TV | IRDB `Panasonic/TV/128,0.csv`, `128,4.csv`, `128,9.csv` | Kandidaten eingetragen |
+| Philips TV | IRDB `Philips/TV/0,-1.csv` | Kandidaten eingetragen |
+| Sharp TV | IRDB `Sharp/TV/1,-1.csv` | Kandidaten eingetragen |
+| TCL/Hisense | IRDB `TCL/TV/15,-1.csv` | recherchiert, aber `RCA-38` wird noch nicht vom Sender unterstuetzt |
+
+TCL/Hisense ist deshalb bewusst noch nicht erweitert. IRDB listet fuer TCL viele passende Tasten, aber als Protokoll `RCA-38`. Die aktuell eingebundene Bibliothek `IRremoteESP8266` 2.9.0 stellt in dieser Installation keinen direkten `sendRCA`/`sendRCA38`-Sender bereit. Dafuer brauchen wir entweder eine eigene RCA-38-Sendekapselung mit `sendGeneric` oder eine zusaetzliche Bibliothek/Implementierung.
 
 Hinweistext gemaess IRDB-Lizenz:
 
