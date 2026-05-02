@@ -49,6 +49,27 @@ class WebDashboardDirectionTest(unittest.TestCase):
         ):
             self.assertIn(expected, dashboard)
 
+    def test_dashboard_has_filterable_testing_ui(self):
+        dashboard = read_text(
+            "firmware/esp32_s3_universal_ir_remote/web_dashboard/WebDashboard.h"
+        )
+
+        for expected in (
+            "data-profile",
+            "data-category",
+            "data-command",
+            "id='search'",
+            "id='emptyState'",
+            "filterCategory",
+            "applyFilters",
+            "clearSearch",
+            "return confirm",
+            "appendCategoryFilter",
+            "appendDashboardScript",
+            "commandCount()",
+        ):
+            self.assertIn(expected, dashboard)
+
     def test_docs_describe_dashboard_as_default_and_hardware_as_minimal(self):
         readme = read_text("README.md")
         hardware = read_text("hardware/README.md")

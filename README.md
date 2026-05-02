@@ -13,7 +13,7 @@ Taster und LCD sind optional und gehoeren nicht mehr zum v1-Default.
 ## Aktueller Stand
 
 - Arduino-Sketch startet einen ESP32-S3 Access Point
-- Web-Dashboard ist die Standardbedienung
+- Web-Dashboard ist die Standardbedienung mit Suche, Kategorienfilter und Statusanzeige
 - IR-Katalog enthaelt 16 Profile und 104 vorbereitete `Untested`-Befehle
 - IR-Sender nutzt weiter `IRremoteESP8266`
 - Minimal-Hardware ist nur ESP32-S3 plus IR-Sendepfad
@@ -42,7 +42,9 @@ Nach dem Flashen:
 2. Mit dem WLAN `IR-Remote` verbinden.
 3. Passwort `irremote` verwenden.
 4. Im Browser `http://192.168.4.1` oeffnen.
-5. Profil und Befehl im Web-Dashboard senden.
+5. Kategorie waehlen oder per Suche filtern.
+6. Profil und Befehl im Web-Dashboard senden.
+7. Diagnostic Sweep nur bewusst ueber die bestaetigte Sweep-Schaltflaeche starten.
 
 ## Repository-Struktur
 
