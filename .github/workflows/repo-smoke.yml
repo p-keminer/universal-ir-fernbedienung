@@ -1,0 +1,51 @@
+name: Repo Smoke
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  required-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check required project files
+        run: |
+          set -euo pipefail
+          test -f README.md
+          test -f ROADMAP.md
+          test -f ARCHITECTURE.md
+          test -f SAFETY_NOTICE.md
+          test -f firmware/README.md
+          test -f hardware/README.md
+          test -f docs/README.md
+          test -f firmware/esp32_s3_universal_ir_remote/esp32_s3_universal_ir_remote.ino
+          test -f firmware/esp32_s3_universal_ir_remote/config/Config.h
+          test -f firmware/esp32_s3_universal_ir_remote/ir_catalog/IrCatalog.h
+          test -f firmware/esp32_s3_universal_ir_remote/ir_sender/IrSender.h
+          test -f firmware/esp32_s3_universal_ir_remote/web_dashboard/WebDashboard.h
+          test -f hardware/electronics/SCHEMATIC_CURRENT.md
+          test -f hardware/electronics/DATASHEET_NOTES.md
+          test -f hardware/schematics/IR_REMOTE_V1_ASCII.md
+          test -f hardware/schematics/IR_TRANSMITTER_BENCH_STEP_01.md
+          test -f docs/IR_CODE_RESEARCH.md
+
+      - name: Run repo direction tests
+        run: python -m unittest discover -s tests
+
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install ESP32 core and libraries
+        run: |
+          set -euo pipefail
+          arduino-cli config init --overwrite
+          arduino-cli config set board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@3.3.7
+          arduino-cli lib install IRremoteESP8266@2.9.0
+
+      - name: Compile ESP32-S3 firmware
+        run: arduino-cli compile --fqbn esp32:esp32:esp32s3 firmware/esp32_s3_universal_ir_remote

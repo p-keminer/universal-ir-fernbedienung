@@ -1,0 +1,37 @@
+# Betriebssystem und Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Build- und Tooling-Artefakte
+build/
+out/
+.pio/
+__pycache__/
+*.pyc
+*.pyo
+
+# Arduino/PlatformIO lokale Dateien
+*.hex
+*.elf
+*.bin
+*.map
+*.eep
+*.lst
+
+# Lokale Umgebungs- und Secret-Dateien
+.env
+.env.local
+.env.*.local
+*.local.*
+
+# Lokale Notizen und private Messdaten
+/docs/private/
+/hardware/private/
+/firmware/**/credentials.local.*
+/firmware/**/device_identity.local.*
+/firmware/**/wifi_config.local.*
+
+# Grosse Rohmedien bewusst selektiv einchecken
+/docs/photos/raw/
