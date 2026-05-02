@@ -79,6 +79,12 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "class='remote-card' hidden data-profile",
             "class='brand-card'",
             "data-profile-index",
+            "overflow-x:hidden",
+            "scrollbar-width:thin",
+            "::-webkit-scrollbar",
+            ".filters{display:grid",
+            "padding-bottom:128px",
+            "border:2px solid",
         ):
             self.assertIn(expected, dashboard)
 
@@ -94,6 +100,7 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "activeCategory='all'",
             "activeCategory==='all'",
             "class='profile-card'",
+            ".filters{display:flex;gap:8px;overflow:auto",
         ):
             self.assertNotIn(removed, dashboard)
 
