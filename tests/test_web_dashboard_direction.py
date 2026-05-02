@@ -85,6 +85,16 @@ class WebDashboardDirectionTest(unittest.TestCase):
             ".filters{display:grid",
             "padding-bottom:128px",
             "border:2px solid",
+            "appendRemoteLayout",
+            "appendDpad",
+            "appendRockerControls",
+            "appendUtilityControls",
+            "class='remote-face'",
+            "class='dpad'",
+            "grid-template-areas",
+            "area-up",
+            "class='rocker-grid'",
+            "class='utility-grid'",
         ):
             self.assertIn(expected, dashboard)
 

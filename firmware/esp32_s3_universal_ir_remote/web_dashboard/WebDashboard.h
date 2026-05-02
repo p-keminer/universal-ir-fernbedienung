@@ -128,9 +128,11 @@ class RemoteWebDashboard {
     Other,
   };
 
+  using CommandMask = uint64_t;
+
   String renderDashboard() const {
     String html;
-    html.reserve(64000);
+    html.reserve(76000);
 
     html += F("<!doctype html><html lang='de'><head><meta charset='utf-8'>");
     html += F("<meta name='viewport' content='width=device-width,initial-scale=1'>");
@@ -146,14 +148,16 @@ class RemoteWebDashboard {
     html += F(".filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;padding:10px 0 0}.filter{width:100%;min-height:44px;white-space:nowrap;padding:0 12px}.filter.active{background:#006d77;color:#fff;border-color:#00545c}");
     html += F(".profile-picker{margin:0 0 20px}.stage-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#2f4048;margin:0 0 8px}.brand-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}");
     html += F(".brand-card{min-height:68px;text-align:left;padding:10px 11px;background:#fff}.brand-card.active{background:#d7f0f2;border-color:#00545c;color:#081116}.brand-card span{display:block;font-size:12px;font-weight:650;color:#33464f;margin-top:3px}");
-    html += F(".remote-stage{display:block;padding-bottom:40px}.remote-card{max-width:720px;margin:0 auto 28px;background:#fff;border:2px solid #bac8ce;border-radius:8px;padding:14px;scroll-margin-top:138px}.remote-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}");
+    html += F(".remote-stage{display:block;padding-bottom:40px}.remote-card{max-width:720px;margin:0 auto 28px;background:#fff;border:2px solid #bac8ce;border-radius:8px;padding:14px;scroll-margin-top:138px}.remote-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}.remote-face{display:grid;gap:18px}");
     html += F("h2{font-size:20px;margin:0}.meta{font-size:12px;margin:4px 0 0;color:#33464f}.pill{border:2px solid #9eb2ba;border-radius:999px;padding:3px 8px;font-size:12px;color:#193940;background:#e3f4f6;white-space:nowrap}");
     html += F(".remote-group{margin-top:15px}.remote-group-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#657078;margin:0 0 8px}.remote-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}");
+    html += F(".remote-section{display:grid;gap:9px}.utility-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.dpad{width:min(100%,360px);margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-areas:'. up .' 'left ok right' '. down .';gap:10px}.area-up{grid-area:up}.area-left{grid-area:left}.area-ok{grid-area:ok}.area-right{grid-area:right}.area-down{grid-area:down}.dpad-spacer{min-height:64px}");
+    html += F(".rocker-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.rocker-column{display:grid;gap:10px}.bottom-grid,.color-grid,.effect-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.color-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.remote-spacer{min-height:60px}");
     html += F("form{margin:0}.command-form[hidden],.brand-card[hidden],.remote-card[hidden],.profile-picker[hidden],.empty[hidden]{display:none}");
     html += F("button{width:100%;min-height:48px;border:2px solid #8799a3;border-radius:8px;background:#f8fbfc;color:#081116;font:inherit;font-weight:800;cursor:pointer;text-align:center}button:hover{background:#dce8ec}");
     html += F(".remote-command button{min-height:60px;padding:8px 6px}.remote-command.power button{background:#fff0e8;border-color:#b84f2c;color:#64210f}.remote-command.nav button{background:#e8f0ff;border-color:#8aa4d6}.remote-command.light button{background:#fff8d9;border-color:#b79c25}");
     html += F(".command-label{display:block}.tag{display:block;font-size:11px;font-weight:650;color:#30444d;margin-top:3px}.empty{border:2px dashed #7f939c;border-radius:8px;padding:18px;text-align:center;color:#33464f;background:#fff}.sweep{margin:22px auto 0;max-width:360px}.sweep button{background:#fff0d4;border-color:#b47811}");
-    html += F("@media (max-width:680px){body{padding:10px}.top{grid-template-columns:1fr}.search-row{grid-template-columns:1fr 78px}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.remote-card{padding:12px;scroll-margin-top:156px}.remote-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.remote-group.nav .remote-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.status{min-width:0}}");
+    html += F("@media (max-width:680px){body{padding:10px}.top{grid-template-columns:1fr}.search-row{grid-template-columns:1fr 78px}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.remote-card{padding:12px;scroll-margin-top:156px}.remote-grid,.bottom-grid,.effect-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.utility-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.remote-group.nav .remote-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.status{min-width:0}}");
     html += F("@media (prefers-color-scheme:dark){:root{scrollbar-color:#87a5af #182225}:root,body{background:#0c1113;color:#f3f8f9}.controls{background:#0c1113;border-color:#34454c}.status,.brand-card,.remote-card,.empty{background:#172022;border-color:#52656d}.search{background:#172022;color:#f3f8f9;border-color:#61757e}.meta,.tag,.stage-title,.remote-group-title{color:#c4d4d9}button{background:#263438;color:#f3f8f9;border-color:#61757e}button:hover{background:#34464c}.filter.active,.brand-card.active{background:#0f6e78;border-color:#75ccd4;color:#fff}.pill{background:#24393e;color:#def8fb;border-color:#61757e}.remote-command.power button{background:#422418;border-color:#c87556;color:#ffd8ca}.remote-command.nav button{background:#1c2b42}.remote-command.light button{background:#3c3412}.sweep button{background:#3d2c10;border-color:#a27a25}}");
     html += F("</style></head><body><div class='shell'><header class='top'><h1>IR Remote</h1><div class='status'><strong>Status</strong><p id='statusText'>");
     appendEscaped(html, lastStatus_.c_str());
@@ -234,18 +238,7 @@ class RemoteWebDashboard {
     html += categoryName(profile.category);
     html += F("</span></div>");
 
-    appendCommandGroup(html, profileIndex, CommandGroup::Power, F("Power"),
-                       "power");
-    appendCommandGroup(html, profileIndex, CommandGroup::VolumeChannel,
-                       F("Lautstaerke / Sender"), "volume");
-    appendCommandGroup(html, profileIndex, CommandGroup::Navigation,
-                       F("Navigation"), "nav");
-    appendCommandGroup(html, profileIndex, CommandGroup::SourceMedia,
-                       F("Eingang / Menue / Media"), "media");
-    appendCommandGroup(html, profileIndex, CommandGroup::Lighting,
-                       F("Licht / Farbe"), "light");
-    appendCommandGroup(html, profileIndex, CommandGroup::Other, F("Weitere"),
-                       "other");
+    appendRemoteLayout(html, profileIndex);
 
     html += F("</section>");
   }
@@ -265,6 +258,255 @@ class RemoteWebDashboard {
         appendEscaped(html, command->name);
       }
     }
+  }
+
+  void appendRemoteLayout(String& html, const uint8_t profileIndex) const {
+    const ir_catalog::IrProfile& profile = ir_catalog::profileAt(profileIndex);
+    const uint8_t commandCount =
+        ir_catalog::commandCountForProfile(profile.id);
+    CommandMask rendered = 0;
+
+    html += F("<div class='remote-face'>");
+    appendUtilityControls(html, profileIndex, profile, commandCount, rendered);
+
+    if (profile.category == ir_catalog::DeviceCategory::LedStrip) {
+      appendLightingControls(html, profileIndex, profile, commandCount,
+                             rendered);
+    } else {
+      appendDpad(html, profileIndex, profile, commandCount, rendered);
+      appendRockerControls(html, profileIndex, profile, commandCount,
+                           rendered);
+      appendBottomControls(html, profileIndex, profile, commandCount,
+                           rendered);
+    }
+
+    appendRemainingCommands(html, profileIndex, profile, commandCount,
+                            rendered);
+    html += F("</div>");
+  }
+
+  void appendUtilityControls(String& html, const uint8_t profileIndex,
+                             const ir_catalog::IrProfile& profile,
+                             const uint8_t commandCount,
+                             CommandMask& rendered) const {
+    const int16_t sourceIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Source",
+                              "Input", "HDMI 1");
+    const int16_t menuIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Menu",
+                              "Menu/Enter", "Info");
+    int16_t powerIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Power",
+                              "Power Toggle", "Power On");
+    if (powerIndex < 0) {
+      powerIndex = findCommandByGroup(profile, commandCount, rendered,
+                                      CommandGroup::Power);
+    }
+
+    if (sourceIndex < 0 && menuIndex < 0 && powerIndex < 0) {
+      return;
+    }
+
+    html += F("<section class='remote-section utility'><p class='remote-group-title'>Schnellzugriff</p><div class='utility-grid'>");
+    appendCommandOrSpacer(html, profileIndex, profile, sourceIndex, "media",
+                          rendered);
+    appendCommandOrSpacer(html, profileIndex, profile, menuIndex, "media",
+                          rendered);
+    appendCommandOrSpacer(html, profileIndex, profile, powerIndex, "power",
+                          rendered);
+    html += F("</div></section>");
+  }
+
+  void appendDpad(String& html, const uint8_t profileIndex,
+                  const ir_catalog::IrProfile& profile,
+                  const uint8_t commandCount, CommandMask& rendered) const {
+    const int16_t upIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Up", nullptr,
+                              nullptr);
+    const int16_t leftIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Left", nullptr,
+                              nullptr);
+    int16_t okIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "OK", "Enter",
+                              "Menu/Enter");
+    if (okIndex < 0) {
+      okIndex = findCommandByGroup(profile, commandCount, rendered,
+                                   CommandGroup::Navigation);
+    }
+    const int16_t rightIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Right", nullptr,
+                              nullptr);
+    const int16_t downIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Down", nullptr,
+                              nullptr);
+
+    if (upIndex < 0 && leftIndex < 0 && okIndex < 0 && rightIndex < 0 &&
+        downIndex < 0) {
+      return;
+    }
+
+    html += F("<section class='remote-section nav-pad'><p class='remote-group-title'>Navigation</p><div class='dpad'>");
+    appendDpadSlot(html, profileIndex, profile, upIndex, "nav area-up",
+                   "area-up", rendered);
+    appendDpadSlot(html, profileIndex, profile, leftIndex, "nav area-left",
+                   "area-left", rendered);
+    appendDpadSlot(html, profileIndex, profile, okIndex, "nav area-ok",
+                   "area-ok", rendered);
+    appendDpadSlot(html, profileIndex, profile, rightIndex, "nav area-right",
+                   "area-right", rendered);
+    appendDpadSlot(html, profileIndex, profile, downIndex, "nav area-down",
+                   "area-down", rendered);
+    html += F("</div></section>");
+  }
+
+  void appendRockerControls(String& html, const uint8_t profileIndex,
+                            const ir_catalog::IrProfile& profile,
+                            const uint8_t commandCount,
+                            CommandMask& rendered) const {
+    const int16_t volUpIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Vol +",
+                              nullptr, nullptr);
+    const int16_t muteIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Mute", nullptr,
+                              nullptr);
+    const int16_t volDownIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Vol -",
+                              nullptr, nullptr);
+    const int16_t channelUpIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Ch +",
+                              nullptr, nullptr);
+    const int16_t channelDownIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Ch -",
+                              nullptr, nullptr);
+
+    if (volUpIndex < 0 && muteIndex < 0 && volDownIndex < 0 &&
+        channelUpIndex < 0 && channelDownIndex < 0) {
+      return;
+    }
+
+    html += F("<section class='remote-section rocker'><p class='remote-group-title'>Lautstaerke / Sender</p><div class='rocker-grid'><div class='rocker-column'>");
+    appendCommandOrSpacer(html, profileIndex, profile, volUpIndex, "volume",
+                          rendered);
+    appendCommandOrSpacer(html, profileIndex, profile, muteIndex, "volume",
+                          rendered);
+    appendCommandOrSpacer(html, profileIndex, profile, volDownIndex, "volume",
+                          rendered);
+    html += F("</div><div class='rocker-column'>");
+    appendCommandOrSpacer(html, profileIndex, profile, channelUpIndex,
+                          "volume", rendered);
+    html += F("<span class='remote-spacer'></span>");
+    appendCommandOrSpacer(html, profileIndex, profile, channelDownIndex,
+                          "volume", rendered);
+    html += F("</div></div></section>");
+  }
+
+  void appendBottomControls(String& html, const uint8_t profileIndex,
+                            const ir_catalog::IrProfile& profile,
+                            const uint8_t commandCount,
+                            CommandMask& rendered) const {
+    uint8_t visibleCommands = 0;
+    for (uint8_t commandIndex = 0; commandIndex < commandCount;
+         ++commandIndex) {
+      if (!isCommandRendered(rendered, commandIndex)) {
+        const ir_catalog::IrCommand* command =
+            ir_catalog::commandAt(profile.id, commandIndex);
+        if (command != nullptr &&
+            classifyCommand(command->name) == CommandGroup::SourceMedia) {
+          ++visibleCommands;
+        }
+      }
+    }
+
+    if (visibleCommands == 0) {
+      return;
+    }
+
+    html += F("<section class='remote-section bottom-controls'><p class='remote-group-title'>Menue / Medien</p><div class='bottom-grid'>");
+    appendCommandGroupRemainder(html, profileIndex, profile, commandCount,
+                                CommandGroup::SourceMedia, "media", rendered);
+    html += F("</div></section>");
+  }
+
+  void appendLightingControls(String& html, const uint8_t profileIndex,
+                              const ir_catalog::IrProfile& profile,
+                              const uint8_t commandCount,
+                              CommandMask& rendered) const {
+    const int16_t brightUpIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Bright +",
+                              nullptr, nullptr);
+    const int16_t brightDownIndex =
+        findFirstNamedCommand(profile, commandCount, rendered, "Bright -",
+                              nullptr, nullptr);
+
+    if (brightUpIndex >= 0 || brightDownIndex >= 0) {
+      html += F("<section class='remote-section rocker'><p class='remote-group-title'>Helligkeit</p><div class='rocker-grid'>");
+      appendCommandOrSpacer(html, profileIndex, profile, brightUpIndex,
+                            "light", rendered);
+      appendCommandOrSpacer(html, profileIndex, profile, brightDownIndex,
+                            "light", rendered);
+      html += F("</div></section>");
+    }
+
+    if (hasAnyNamedCommand(profile, commandCount, rendered, "Red", "Green",
+                           "Blue", "White")) {
+      html += F("<section class='remote-section colors'><p class='remote-group-title'>Farben</p><div class='color-grid'>");
+      appendCommandByNameIfPresent(html, profileIndex, profile, commandCount,
+                                   "Red", "light", rendered);
+      appendCommandByNameIfPresent(html, profileIndex, profile, commandCount,
+                                   "Green", "light", rendered);
+      appendCommandByNameIfPresent(html, profileIndex, profile, commandCount,
+                                   "Blue", "light", rendered);
+      appendCommandByNameIfPresent(html, profileIndex, profile, commandCount,
+                                   "White", "light", rendered);
+      html += F("</div></section>");
+    }
+
+    uint8_t effectCommands = 0;
+    for (uint8_t commandIndex = 0; commandIndex < commandCount;
+         ++commandIndex) {
+      if (!isCommandRendered(rendered, commandIndex)) {
+        const ir_catalog::IrCommand* command =
+            ir_catalog::commandAt(profile.id, commandIndex);
+        if (command != nullptr &&
+            classifyCommand(command->name) == CommandGroup::Lighting) {
+          ++effectCommands;
+        }
+      }
+    }
+
+    if (effectCommands > 0) {
+      html += F("<section class='remote-section effects'><p class='remote-group-title'>Effekte</p><div class='effect-grid'>");
+      appendCommandGroupRemainder(html, profileIndex, profile, commandCount,
+                                  CommandGroup::Lighting, "light", rendered);
+      html += F("</div></section>");
+    }
+  }
+
+  void appendRemainingCommands(String& html, const uint8_t profileIndex,
+                               const ir_catalog::IrProfile& profile,
+                               const uint8_t commandCount,
+                               CommandMask& rendered) const {
+    uint8_t visibleCommands = 0;
+    for (uint8_t commandIndex = 0; commandIndex < commandCount;
+         ++commandIndex) {
+      if (!isCommandRendered(rendered, commandIndex)) {
+        ++visibleCommands;
+      }
+    }
+
+    if (visibleCommands == 0) {
+      return;
+    }
+
+    html += F("<section class='remote-group other'><p class='remote-group-title'>Weitere</p><div class='remote-grid'>");
+    for (uint8_t commandIndex = 0; commandIndex < commandCount;
+         ++commandIndex) {
+      if (!isCommandRendered(rendered, commandIndex)) {
+        appendCommandIndex(html, profileIndex, profile, commandIndex, "other",
+                           rendered);
+      }
+    }
+    html += F("</div></section>");
   }
 
   void appendCommandGroup(String& html, const uint8_t profileIndex,
@@ -339,6 +581,89 @@ class RemoteWebDashboard {
     html += F(" / ");
     html += ir_catalog::protocolName(command.protocol);
     html += F("</span></button></form>");
+  }
+
+  void appendCommandIndex(String& html, const uint8_t profileIndex,
+                          const ir_catalog::IrProfile& profile,
+                          const int16_t commandIndex, const char* cssClass,
+                          CommandMask& rendered) const {
+    if (commandIndex < 0 || commandIndex > 255) {
+      return;
+    }
+
+    const uint8_t safeIndex = static_cast<uint8_t>(commandIndex);
+    const ir_catalog::IrCommand* command =
+        ir_catalog::commandAt(profile.id, safeIndex);
+    if (command == nullptr) {
+      return;
+    }
+
+    appendCommandForm(html, profileIndex, safeIndex, profile, *command,
+                      cssClass);
+    markCommandRendered(rendered, safeIndex);
+  }
+
+  void appendCommandOrSpacer(String& html, const uint8_t profileIndex,
+                             const ir_catalog::IrProfile& profile,
+                             const int16_t commandIndex, const char* cssClass,
+                             CommandMask& rendered) const {
+    if (commandIndex >= 0) {
+      appendCommandIndex(html, profileIndex, profile, commandIndex, cssClass,
+                         rendered);
+      return;
+    }
+
+    html += F("<span class='remote-spacer'></span>");
+  }
+
+  void appendDpadSlot(String& html, const uint8_t profileIndex,
+                      const ir_catalog::IrProfile& profile,
+                      const int16_t commandIndex, const char* cssClass,
+                      const char* areaClass, CommandMask& rendered) const {
+    if (commandIndex >= 0) {
+      appendCommandIndex(html, profileIndex, profile, commandIndex, cssClass,
+                         rendered);
+      return;
+    }
+
+    html += F("<span class='dpad-spacer ");
+    html += areaClass;
+    html += F("'></span>");
+  }
+
+  void appendCommandByNameIfPresent(String& html, const uint8_t profileIndex,
+                                    const ir_catalog::IrProfile& profile,
+                                    const uint8_t commandCount,
+                                    const char* commandName,
+                                    const char* cssClass,
+                                    CommandMask& rendered) const {
+    const int16_t commandIndex =
+        findCommandIndexByName(profile, commandCount, rendered, commandName);
+    if (commandIndex >= 0) {
+      appendCommandIndex(html, profileIndex, profile, commandIndex, cssClass,
+                         rendered);
+    }
+  }
+
+  void appendCommandGroupRemainder(String& html, const uint8_t profileIndex,
+                                   const ir_catalog::IrProfile& profile,
+                                   const uint8_t commandCount,
+                                   const CommandGroup group,
+                                   const char* cssClass,
+                                   CommandMask& rendered) const {
+    for (uint8_t commandIndex = 0; commandIndex < commandCount;
+         ++commandIndex) {
+      if (isCommandRendered(rendered, commandIndex)) {
+        continue;
+      }
+
+      const ir_catalog::IrCommand* command =
+          ir_catalog::commandAt(profile.id, commandIndex);
+      if (command != nullptr && classifyCommand(command->name) == group) {
+        appendCommandIndex(html, profileIndex, profile, commandIndex, cssClass,
+                           rendered);
+      }
+    }
   }
 
   void appendCategoryFilter(String& html, const char* key,
@@ -434,8 +759,98 @@ class RemoteWebDashboard {
     }
   }
 
+  static bool isCommandRendered(const CommandMask rendered,
+                                const uint8_t commandIndex) {
+    return commandIndex < 64 &&
+           (rendered & (static_cast<CommandMask>(1) << commandIndex)) != 0;
+  }
+
+  static void markCommandRendered(CommandMask& rendered,
+                                  const uint8_t commandIndex) {
+    if (commandIndex < 64) {
+      rendered |= static_cast<CommandMask>(1) << commandIndex;
+    }
+  }
+
+  static int16_t findCommandIndexByName(const ir_catalog::IrProfile& profile,
+                                        const uint8_t commandCount,
+                                        const CommandMask rendered,
+                                        const char* commandName) {
+    if (commandName == nullptr) {
+      return -1;
+    }
+
+    for (uint8_t commandIndex = 0; commandIndex < commandCount;
+         ++commandIndex) {
+      if (isCommandRendered(rendered, commandIndex)) {
+        continue;
+      }
+
+      const ir_catalog::IrCommand* command =
+          ir_catalog::commandAt(profile.id, commandIndex);
+      if (command != nullptr && strcmp(command->name, commandName) == 0) {
+        return commandIndex;
+      }
+    }
+
+    return -1;
+  }
+
+  static int16_t findFirstNamedCommand(const ir_catalog::IrProfile& profile,
+                                       const uint8_t commandCount,
+                                       const CommandMask rendered,
+                                       const char* first,
+                                       const char* second,
+                                       const char* third) {
+    const int16_t firstIndex =
+        findCommandIndexByName(profile, commandCount, rendered, first);
+    if (firstIndex >= 0) {
+      return firstIndex;
+    }
+
+    const int16_t secondIndex =
+        findCommandIndexByName(profile, commandCount, rendered, second);
+    if (secondIndex >= 0) {
+      return secondIndex;
+    }
+
+    return findCommandIndexByName(profile, commandCount, rendered, third);
+  }
+
+  static bool hasAnyNamedCommand(const ir_catalog::IrProfile& profile,
+                                 const uint8_t commandCount,
+                                 const CommandMask rendered, const char* first,
+                                 const char* second, const char* third,
+                                 const char* fourth) {
+    return findCommandIndexByName(profile, commandCount, rendered, first) >= 0 ||
+           findCommandIndexByName(profile, commandCount, rendered, second) >=
+               0 ||
+           findCommandIndexByName(profile, commandCount, rendered, third) >= 0 ||
+           findCommandIndexByName(profile, commandCount, rendered, fourth) >= 0;
+  }
+
   static bool containsText(const char* text, const char* needle) {
     return strstr(text, needle) != nullptr;
+  }
+
+  static int16_t findCommandByGroup(const ir_catalog::IrProfile& profile,
+                                    const uint8_t commandCount,
+                                    const CommandMask rendered,
+                                    const CommandGroup group) {
+    for (uint8_t commandIndex = 0; commandIndex < commandCount;
+         ++commandIndex) {
+      if (isCommandRendered(rendered, commandIndex)) {
+        continue;
+      }
+
+      const ir_catalog::IrCommand* command =
+          ir_catalog::commandAt(profile.id, commandIndex);
+      if (command != nullptr && classifyCommand(command->name) == group) {
+        return commandIndex;
+      }
+    }
+
+    return -1;
   }
 
   static CommandGroup classifyCommand(const char* name) {
