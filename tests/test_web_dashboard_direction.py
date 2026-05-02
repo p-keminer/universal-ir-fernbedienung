@@ -59,15 +59,26 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "data-category",
             "data-command",
             "id='search'",
+            "id='profilePicker'",
             "id='emptyState'",
             "filterCategory",
+            "selectProfile",
+            "sendCommand",
+            "fetch(form.action",
             "applyFilters",
             "clearSearch",
+            "confirmCommand",
             "return confirm",
             "appendCategoryFilter",
+            "appendProfileOption",
+            "appendCommandGroup",
             "appendDashboardScript",
+            "classifyCommand",
             "let activeCategory='';",
-            "hidden data-profile",
+            "let activeProfile='';",
+            "class='remote-card' hidden data-profile",
+            "class='brand-card'",
+            "data-profile-index",
         ):
             self.assertIn(expected, dashboard)
 
@@ -82,6 +93,7 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "data-filter='all'",
             "activeCategory='all'",
             "activeCategory==='all'",
+            "class='profile-card'",
         ):
             self.assertNotIn(removed, dashboard)
 

@@ -19,9 +19,10 @@ Der Sketch:
 2. initialisiert den IR-Sender auf `GPIO4`
 3. startet den Access Point `IR-Remote`
 4. stellt das Dashboard unter `http://192.168.4.1` bereit
-5. zeigt nach Kategorieauswahl Profilkarten, Suche und letzten Sendestatus
-6. sendet den gewaehlten IR-Befehl ueber `/send`
-7. bietet den Diagnostic Sweep nur manuell und mit Browser-Bestaetigung ueber `/sweep` an
+5. zeigt nach Kategorieauswahl erst passende Marken/Profile
+6. oeffnet danach eine fernbedienungsartige Tastenansicht pro Profil
+7. sendet den gewaehlten IR-Befehl ueber `/send`, ohne die Auswahlansicht zu verlassen
+8. bietet den Diagnostic Sweep nur manuell und mit Browser-Bestaetigung ueber `/sweep` an
 
 Die alte automatische Dauerschleife ist entfernt.
 Taster, Joystick und LCD1602 sind nicht Teil des v1-Defaults.
@@ -37,10 +38,13 @@ Taster, Joystick und LCD1602 sind nicht Teil des v1-Defaults.
 
 ## UI-Funktionen
 
-- Profilkarten erscheinen erst nach Auswahl einer Kategorie
+- Auswahlstufe 1: Kategorie, z.B. TV, Media oder LED Strip
+- Auswahlstufe 2: Marke/Profil innerhalb der Kategorie
+- Fernbedienungsansicht mit gruppierten Befehlen fuer Power, Lautstaerke/Sender, Navigation, Eingang/Media, Licht/Farbe und Weitere
 - Suche ueber Profil- und Befehlsnamen
 - Kategorienfilter fuer TV, Media, LED Strip, Projektor, Audio und Test
 - Status-/Protokoll-Tags pro Befehl
+- Power-/Off-Befehle mit Bestaetigungsdialog gegen versehentliches Senden
 - Diagnostic Sweep mit Bestaetigungsdialog
 
 ## Routen
