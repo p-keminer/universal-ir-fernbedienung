@@ -66,6 +66,8 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "return confirm",
             "appendCategoryFilter",
             "appendDashboardScript",
+            "let activeCategory='';",
+            "hidden data-profile",
         ):
             self.assertIn(expected, dashboard)
 
@@ -75,6 +77,11 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "<strong>Befehle</strong>",
             "<strong>Status</strong><span>Test</span>",
             "config::kWifiApSsid;\n    html += F(\" / http://\");",
+            "appendCategoryFilter(html, \"all\"",
+            "F(\"Alle\")",
+            "data-filter='all'",
+            "activeCategory='all'",
+            "activeCategory==='all'",
         ):
             self.assertNotIn(removed, dashboard)
 

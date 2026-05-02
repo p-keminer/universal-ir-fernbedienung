@@ -144,13 +144,12 @@ class RemoteWebDashboard {
     html += F("</style></head><body><div class='shell'><header class='top'><h1>IR Remote</h1><div class='status'><strong>Status</strong><p>");
     appendEscaped(html, lastStatus_.c_str());
     html += F("</p></div></header><section class='controls'><div class='search-row'><input id='search' class='search' type='search' placeholder='Profil oder Befehl suchen' oninput='applyFilters()'><button type='button' onclick='clearSearch()'>Reset</button></div><div class='filters'>");
-    appendCategoryFilter(html, "all", F("Alle"), true);
-    appendCategoryFilter(html, "tv", F("TV"), false);
-    appendCategoryFilter(html, "media", F("Media"), false);
-    appendCategoryFilter(html, "led", F("LED Strip"), false);
-    appendCategoryFilter(html, "projector", F("Projektor"), false);
-    appendCategoryFilter(html, "audio", F("Audio"), false);
-    appendCategoryFilter(html, "test", F("Test"), false);
+    appendCategoryFilter(html, "tv", F("TV"));
+    appendCategoryFilter(html, "media", F("Media"));
+    appendCategoryFilter(html, "led", F("LED Strip"));
+    appendCategoryFilter(html, "projector", F("Projektor"));
+    appendCategoryFilter(html, "audio", F("Audio"));
+    appendCategoryFilter(html, "test", F("Test"));
     html += F("</div></section><p id='emptyState' class='empty' hidden>Keine passenden Befehle gefunden.</p><main class='grid'>");
 
     for (uint8_t profileIndex = 0; profileIndex < ir_catalog::profileCount();
@@ -170,7 +169,7 @@ class RemoteWebDashboard {
     const uint8_t commandCount =
         ir_catalog::commandCountForProfile(profile.id);
 
-    html += F("<section class='profile-card' data-profile='");
+    html += F("<section class='profile-card' hidden data-profile='");
     appendEscaped(html, profile.name);
     html += F("' data-category='");
     html += categoryKey(profile.category);
@@ -230,11 +229,8 @@ class RemoteWebDashboard {
   }
 
   void appendCategoryFilter(String& html, const char* key,
-                            const __FlashStringHelper* label,
-                            const bool active) const {
-    html += F("<button class='filter");
-    html += active ? F(" active") : F("");
-    html += F("' type='button' data-filter='");
+                            const __FlashStringHelper* label) const {
+    html += F("<button class='filter' type='button' data-filter='");
     html += key;
     html += F("' onclick=\"filterCategory('");
     html += key;
@@ -245,11 +241,11 @@ class RemoteWebDashboard {
 
   void appendDashboardScript(String& html) const {
     html += F("<script>");
-    html += F("let activeCategory='all';");
+    html += F("let activeCategory='';");
     html += F("function normalize(v){return (v||'').toLowerCase();}");
     html += F("function filterCategory(category,button){activeCategory=category;document.querySelectorAll('.filter').forEach(function(item){item.classList.remove('active')});button.classList.add('active');applyFilters();}");
-    html += F("function clearSearch(){document.getElementById('search').value='';activeCategory='all';document.querySelectorAll('.filter').forEach(function(item){item.classList.toggle('active',item.dataset.filter==='all')});applyFilters();}");
-    html += F("function applyFilters(){const query=normalize(document.getElementById('search').value);let visibleProfiles=0;document.querySelectorAll('.profile-card').forEach(function(card){const categoryOk=activeCategory==='all'||card.dataset.category===activeCategory;let visibleCommands=0;card.querySelectorAll('.command-form').forEach(function(form){const text=normalize(card.dataset.search+' '+form.dataset.command);const show=categoryOk&&(!query||text.indexOf(query)!==-1);form.hidden=!show;if(show){visibleCommands++;}});const profileMatch=!query||normalize(card.dataset.search).indexOf(query)!==-1;const showCard=categoryOk&&(visibleCommands>0||profileMatch);card.hidden=!showCard;if(showCard){visibleProfiles++;}});document.getElementById('emptyState').hidden=visibleProfiles!==0;}");
+    html += F("function clearSearch(){document.getElementById('search').value='';activeCategory='';document.querySelectorAll('.filter').forEach(function(item){item.classList.remove('active')});applyFilters();}");
+    html += F("function applyFilters(){const query=normalize(document.getElementById('search').value);const hasCategory=activeCategory!=='';let visibleProfiles=0;document.querySelectorAll('.profile-card').forEach(function(card){const categoryOk=hasCategory&&card.dataset.category===activeCategory;const text=normalize(card.dataset.search);const showCard=categoryOk&&(!query||text.indexOf(query)!==-1);card.hidden=!showCard;card.querySelectorAll('.command-form').forEach(function(form){form.hidden=!showCard});if(showCard){visibleProfiles++;}});document.getElementById('emptyState').hidden=!hasCategory||visibleProfiles!==0;}");
     html += F("document.addEventListener('DOMContentLoaded',applyFilters);");
     html += F("</script>");
   }

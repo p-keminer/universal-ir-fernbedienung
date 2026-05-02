@@ -19,7 +19,7 @@ Der Sketch:
 2. initialisiert den IR-Sender auf `GPIO4`
 3. startet den Access Point `IR-Remote`
 4. stellt das Dashboard unter `http://192.168.4.1` bereit
-5. zeigt Profilkarten, Kategorienfilter, Suche und letzten Sendestatus
+5. zeigt nach Kategorieauswahl Profilkarten, Suche und letzten Sendestatus
 6. sendet den gewaehlten IR-Befehl ueber `/send`
 7. bietet den Diagnostic Sweep nur manuell und mit Browser-Bestaetigung ueber `/sweep` an
 
@@ -37,7 +37,7 @@ Taster, Joystick und LCD1602 sind nicht Teil des v1-Defaults.
 
 ## UI-Funktionen
 
-- Profilkarten fuer alle Katalogprofile
+- Profilkarten erscheinen erst nach Auswahl einer Kategorie
 - Suche ueber Profil- und Befehlsnamen
 - Kategorienfilter fuer TV, Media, LED Strip, Projektor, Audio und Test
 - Status-/Protokoll-Tags pro Befehl
