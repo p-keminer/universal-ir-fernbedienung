@@ -8,7 +8,7 @@ PDFs werden nicht eingecheckt; Links und relevante Entscheidungen reichen fuer d
 - Quelle: Espressif ESP32-S3 Series Datasheet
 - Link: https://documentation.espressif.com/esp32-s3_datasheet_en.pdf
 - Relevanz: GPIO-Funktionen, elektrische Grenzwerte, Boot-/USB-Pins, 3,3-V-Logik.
-- Projektregel: Arduino-ESP32 `esp32:esp32:esp32s3` Defaults sind Startwerte, das konkrete Board-Pinout bleibt massgeblich.
+- Projektregel: Das Projekt nutzt das Custom-FQBN `esp32:esp32:robotic_arm_s3n16r8` fuer ein ESP32-S3-N16R8-Board mit 16 MB Flash und 8 MB OPI-PSRAM.
 
 ## ESP32-S3-DevKitC-1
 

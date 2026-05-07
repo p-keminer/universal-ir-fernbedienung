@@ -14,7 +14,7 @@ Taster und LCD sind optional und gehoeren nicht mehr zum v1-Default.
 
 - Arduino-Sketch startet einen ESP32-S3 Access Point
 - Web-Dashboard ist die Standardbedienung mit Suche, Kategorienfilter und Statusanzeige
-- IR-Katalog enthaelt 16 Profile und 104 vorbereitete `Untested`-Befehle
+- IR-Katalog enthaelt 16 Profile und 141 vorbereitete `Untested`-Befehle
 - IR-Sender nutzt weiter `IRremoteESP8266`
 - Minimal-Hardware ist nur ESP32-S3 plus IR-Sendepfad
 - Taster, Joystick und LCD1602 liegen als future/optional zur Seite
@@ -84,7 +84,7 @@ Defaultwerte:
 
 | Funktion | Wert |
 | --- | --- |
-| Board/FQBN | `esp32:esp32:esp32s3` |
+| Board/FQBN | `esp32:esp32:robotic_arm_s3n16r8` |
 | IR-Ausgang | `GPIO4` |
 | WLAN-SSID | `IR-Remote` |
 | WLAN-Passwort | `irremote` |
@@ -94,7 +94,7 @@ Defaultwerte:
 Compile:
 
 ```text
-arduino-cli compile --fqbn esp32:esp32:esp32s3 firmware/esp32_s3_universal_ir_remote
+arduino-cli compile --fqbn esp32:esp32:robotic_arm_s3n16r8 firmware/esp32_s3_universal_ir_remote
 ```
 
 ## Naechste Schritte

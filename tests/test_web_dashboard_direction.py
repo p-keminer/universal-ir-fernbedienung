@@ -37,6 +37,19 @@ class WebDashboardDirectionTest(unittest.TestCase):
         self.assertIn("kWebServerPort = 80", config)
         self.assertIn('kDashboardIp = "192.168.4.1"', config)
 
+    def test_project_uses_custom_esp32s3_board_profile(self):
+        readme = read_text("README.md")
+        workflow = read_text(".github/workflows/repo-smoke.yml")
+        board = read_text("hardware/boards/boards.local.txt")
+
+        fqbn = "esp32:esp32:robotic_arm_s3n16r8"
+        self.assertIn(fqbn, readme)
+        self.assertIn(fqbn, workflow)
+        self.assertIn("robotic_arm_s3n16r8.name=IMU Robotic Arm", board)
+        self.assertIn("robotic_arm_s3n16r8.build.partitions=app3M_fat9M_16MB", board)
+        self.assertNotIn("arduino-cli compile --fqbn esp32:esp32:esp32s3", readme)
+        self.assertNotIn("arduino-cli compile --fqbn esp32:esp32:esp32s3", workflow)
+
     def test_web_dashboard_module_exposes_expected_routes(self):
         dashboard = read_text(
             "firmware/esp32_s3_universal_ir_remote/web_dashboard/WebDashboard.h"
@@ -79,8 +92,8 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "appendCommandGroup",
             "appendDashboardScript",
             "classifyCommand",
-            "let activeCategory='';",
-            "let activeProfile='';",
+            "var activeCategory='';",
+            "var activeProfile='';",
             "class='remote-card' hidden data-profile",
             "class='brand-card'",
             "data-profile-index",
@@ -118,6 +131,24 @@ class WebDashboardDirectionTest(unittest.TestCase):
             ".filters{display:flex;gap:8px;overflow:auto",
         ):
             self.assertNotIn(removed, dashboard)
+
+    def test_dashboard_click_handlers_load_before_visible_controls(self):
+        dashboard = read_text(
+            "firmware/esp32_s3_universal_ir_remote/web_dashboard/WebDashboard.h"
+        )
+
+        script_call = dashboard.index("appendDashboardScript(html);")
+        body_start = dashboard.index("</head><body")
+
+        self.assertLess(script_call, body_start)
+
+    def test_dashboard_script_uses_browser_safe_node_iteration(self):
+        dashboard = read_text(
+            "firmware/esp32_s3_universal_ir_remote/web_dashboard/WebDashboard.h"
+        )
+
+        self.assertIn("function forEachMatch(selector,callback)", dashboard)
+        self.assertNotIn(".forEach(function", dashboard)
 
     def test_docs_describe_dashboard_as_default_and_hardware_as_minimal(self):
         readme = read_text("README.md")

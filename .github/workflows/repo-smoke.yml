@@ -28,6 +28,7 @@ jobs:
           test -f firmware/esp32_s3_universal_ir_remote/web_dashboard/WebDashboard.h
           test -f hardware/electronics/SCHEMATIC_CURRENT.md
           test -f hardware/electronics/DATASHEET_NOTES.md
+          test -f hardware/boards/boards.local.txt
           test -f hardware/schematics/IR_REMOTE_V1_ASCII.md
           test -f hardware/schematics/IR_TRANSMITTER_BENCH_STEP_01.md
           test -f docs/IR_CODE_RESEARCH.md
@@ -46,6 +47,7 @@ jobs:
           arduino-cli core update-index
           arduino-cli core install esp32:esp32@3.3.7
           arduino-cli lib install IRremoteESP8266@2.9.0
+          cp hardware/boards/boards.local.txt "$HOME/.arduino15/packages/esp32/hardware/esp32/3.3.7/boards.local.txt"
 
       - name: Compile ESP32-S3 firmware
-        run: arduino-cli compile --fqbn esp32:esp32:esp32s3 firmware/esp32_s3_universal_ir_remote
+        run: arduino-cli compile --fqbn esp32:esp32:robotic_arm_s3n16r8 firmware/esp32_s3_universal_ir_remote
