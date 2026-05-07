@@ -219,9 +219,23 @@ class WebDashboardDirectionTest(unittest.TestCase):
         self.assertIn("panasonicIrdb", catalog)
         self.assertIn("rc5Irdb", catalog)
         self.assertIn("sharpIrdb", catalog)
+        self.assertIn(
+            'ProfileId::PhilipsTv, "Power", DeviceCategory::Tv, IrProtocol::Rc5,\n'
+            "     CodeStatus::Confirmed",
+            catalog,
+        )
         self.assertIn("TCL/Hisense", research)
         self.assertIn("RCA-38", research)
         self.assertIn("noch nicht vom Sender unterstuetzt", research)
+
+    def test_philips_first_test_note_records_only_confirmed_power(self):
+        note = read_text("docs/session_notes/2026-05-08_philips_tv_first_test.md")
+
+        self.assertIn("Philips TV | Power", note)
+        self.assertIn("funktioniert", note)
+        self.assertIn("Input | RC5", note)
+        self.assertIn("gleiche TV-Reaktion wie `Menu`", note)
+        self.assertIn("Nur `Power` wird im aktiven Katalog auf `confirmed` gesetzt.", note)
 
 
 if __name__ == "__main__":

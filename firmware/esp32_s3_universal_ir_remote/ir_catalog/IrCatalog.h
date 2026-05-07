@@ -313,8 +313,8 @@ static constexpr IrCommand kCommands[] = {
      0x4004, 32, false, "IRDB Panasonic TV 128,9 f=149"},
 
     {ProfileId::PhilipsTv, "Power", DeviceCategory::Tv, IrProtocol::Rc5,
-     CodeStatus::Untested, rc5Irdb(0, 12), 0, 12, true,
-     "IRDB Philips TV RC5 0,-1 f=12"},
+     CodeStatus::Confirmed, rc5Irdb(0, 12), 0, 12, true,
+     "Confirmed 2026-05-08 at 20 cm on Philips TV; IRDB RC5 0,-1 f=12"},
     {ProfileId::PhilipsTv, "Vol +", DeviceCategory::Tv, IrProtocol::Rc5,
      CodeStatus::Untested, rc5Irdb(0, 16), 0, 12, false,
      "IRDB Philips TV RC5 0,-1 f=16"},
