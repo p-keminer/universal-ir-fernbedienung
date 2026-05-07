@@ -51,3 +51,6 @@ jobs:
 
       - name: Compile ESP32-S3 firmware
         run: arduino-cli compile --fqbn esp32:esp32:robotic_arm_s3n16r8 firmware/esp32_s3_universal_ir_remote
+
+      - name: Compile IR capture firmware
+        run: arduino-cli compile --fqbn esp32:esp32:robotic_arm_s3n16r8 firmware/ir_code_capture

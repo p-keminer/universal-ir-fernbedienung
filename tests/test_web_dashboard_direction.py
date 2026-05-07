@@ -45,10 +45,27 @@ class WebDashboardDirectionTest(unittest.TestCase):
         fqbn = "esp32:esp32:robotic_arm_s3n16r8"
         self.assertIn(fqbn, readme)
         self.assertIn(fqbn, workflow)
+        self.assertIn("firmware/ir_code_capture", workflow)
         self.assertIn("robotic_arm_s3n16r8.name=IMU Robotic Arm", board)
         self.assertIn("robotic_arm_s3n16r8.build.partitions=app3M_fat9M_16MB", board)
         self.assertNotIn("arduino-cli compile --fqbn esp32:esp32:esp32s3", readme)
         self.assertNotIn("arduino-cli compile --fqbn esp32:esp32:esp32s3", workflow)
+
+    def test_ir_capture_sketch_and_docs_define_receiver_pin(self):
+        sketch = read_text("firmware/ir_code_capture/ir_code_capture.ino")
+        firmware = read_text("firmware/README.md")
+        receiver = read_text("hardware/electronics/IR_RECEIVER_CAPTURE.md")
+        research = read_text("docs/IR_CODE_RESEARCH.md")
+
+        self.assertIn("constexpr uint16_t kRecvPin = 15", sketch)
+        self.assertIn("IRrecv irrecv(kRecvPin", sketch)
+        self.assertIn("resultToSourceCode(&results)", sketch)
+        self.assertIn("irrecv.resume()", sketch)
+        self.assertIn("GPIO15", firmware)
+        self.assertIn("KY-022", receiver)
+        self.assertIn("VS1838B", receiver)
+        self.assertIn("S/OUT -> GPIO15", receiver)
+        self.assertIn("Eigene Captures", research)
 
     def test_web_dashboard_module_exposes_expected_routes(self):
         dashboard = read_text(

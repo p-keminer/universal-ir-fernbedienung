@@ -10,6 +10,7 @@ Vorlagen fuer wiederkehrende Projektprotokolle.
 - `BENCH_TEST_RECORD_TEMPLATE.md`
 - `IR_CODE_TEST_RECORD_TEMPLATE.md`
 - `LCD_TEST_RECORD_TEMPLATE.md` fuer den optionalen future LCD-Pfad
+- `IR_CAPTURE_RECORD_TEMPLATE.md` fuer echte Captures mit IR-Empfaenger
 
 ## Nutzung
 

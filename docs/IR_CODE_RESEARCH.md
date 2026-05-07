@@ -39,10 +39,12 @@ Ein Code wird erst nach realem Test auf `Confirmed` oder `Rejected` gesetzt.
 
 ## Quellen
 
+- Ausgangssketch des Projekts: erste Samsung/LG/Sony/Panasonic/Philips/NEC/JVC/Sharp/Apple/LED-Testcodes
 - IRremoteESP8266 Repository und API: https://github.com/crankyoldgit/IRremoteESP8266
 - IRremoteESP8266 Supported Protocols: https://github.com/crankyoldgit/IRremoteESP8266/blob/master/SupportedProtocols.md
 - IRDB als Kandidatenquelle: https://github.com/probonopd/irdb
 - LIRC Remote Database als Kandidatenquelle: https://lirc-remotes.sourceforge.net/remotes-table.html
+- Eigene Captures mit `firmware/ir_code_capture/` gelten als hoechste Prioritaet.
 
 ## IRDB-Hinweis
 
@@ -70,6 +72,22 @@ https://github.com/probonopd/irdb
 ```
 
 Fuer dieses Bastelprojekt gilt trotzdem: IRDB liefert nur Kandidaten, kein Funktionsversprechen.
+
+## Eigene Captures
+
+Eigene Captures sind fuer reale Geraete die beste Quelle.
+Sie werden mit einem 38-kHz-IR-Empfaenger wie `KY-022` oder `VS1838B` aufgezeichnet.
+
+Default:
+
+```text
+IR-Receiver S/OUT -> GPIO15
+IR-Receiver VCC   -> 3V3
+IR-Receiver GND   -> GND
+```
+
+Pro Taste werden mindestens drei kurze Tastendruecke verglichen.
+Nur stabile Ergebnisse werden in den aktiven Katalog uebernommen.
 
 ## Sortierregeln
 
