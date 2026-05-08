@@ -47,8 +47,12 @@ class RemoteWebDashboard {
     server_.on("/mode", HTTP_ANY, [this]() { handleMode(); });
     server_.on("/capture/status", HTTP_GET,
                [this]() { handleCaptureStatus(); });
+    server_.on("/capture/label", HTTP_ANY,
+               [this]() { handleCaptureLabel(); });
     server_.on("/captures/download", HTTP_GET,
                [this]() { handleCaptureDownload(); });
+    server_.on("/captures/clear", HTTP_ANY,
+               [this]() { handleCaptureClear(); });
     server_.onNotFound([this]() { redirectHome(); });
     server_.begin();
 
@@ -143,8 +147,25 @@ class RemoteWebDashboard {
     sendCaptureStatusJson();
   }
 
+  void handleCaptureLabel() {
+    if (!server_.hasArg("label")) {
+      server_.send(400, "text/plain", "label fehlt");
+      return;
+    }
+
+    receiver_.setCaptureLabel(server_.arg("label"));
+    lastStatus_ = F("Capture-Titel gesetzt");
+    sendCaptureStatusJson();
+  }
+
   void handleCaptureDownload() {
     receiver_.appendCaptureDownloadTo(server_);
+  }
+
+  void handleCaptureClear() {
+    lastStatus_ = receiver_.clearCaptures() ? F("Capture-Log geloescht")
+                                            : F("Capture-Log Fehler");
+    sendCaptureStatusJson();
   }
 
   void sendCaptureStatusJson() {
@@ -154,6 +175,9 @@ class RemoteWebDashboard {
     payload += receiver_.modeName();
     payload += F("\",\"storage\":");
     payload += receiver_.storageReady() ? F("true") : F("false");
+    payload += F(",\"label\":\"");
+    appendJsonEscaped(payload, receiver_.captureLabel().c_str());
+    payload += F("\"");
     payload += F(",\"latest\":\"");
     appendJsonEscaped(payload, receiver_.latestCaptureSummary().c_str());
     payload += F("\"}");
@@ -200,7 +224,7 @@ class RemoteWebDashboard {
 
   String renderDashboard() const {
     String html;
-    html.reserve(76000);
+    html.reserve(79000);
 
     html += F("<!doctype html><html lang='de'><head><meta charset='utf-8'>");
     html += F("<meta name='viewport' content='width=device-width,initial-scale=1'>");
@@ -211,7 +235,7 @@ class RemoteWebDashboard {
     html += F(".shell{max-width:980px;margin:0 auto;padding-bottom:128px}.top{display:grid;grid-template-columns:1fr minmax(190px,280px);gap:12px;align-items:center;margin-bottom:10px}");
     html += F("h1{font-size:25px;line-height:1.05;margin:0}.status{border:2px solid #8a9da5;background:#fff;padding:9px 11px;border-radius:8px;min-width:0}");
     html += F(".status strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#32434b}.status p{margin:4px 0 0;min-height:20px}");
-    html += F(".mode-panel{border:2px solid #8a9da5;background:#fff;border-radius:8px;padding:10px 12px;margin:0 0 12px}.mode-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}.mode-button.active{background:#006d77;color:#fff;border-color:#00545c}.capture-panel{border-top:1px solid #bac8ce;padding-top:10px}.capture-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.capture-head strong{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#32434b}.capture-download{display:inline-flex;align-items:center;justify-content:center;min-height:38px;border:2px solid #8799a3;border-radius:8px;padding:0 10px;color:#081116;text-decoration:none;font-weight:800}.capture-latest{white-space:pre-wrap;max-height:220px;overflow:auto;margin:0;background:#eef4f6;border:1px solid #bac8ce;border-radius:6px;padding:10px;font:12px ui-monospace,SFMono-Regular,Consolas,monospace}");
+    html += F(".mode-panel{border:2px solid #8a9da5;background:#fff;border-radius:8px;padding:10px 12px;margin:0 0 12px}.mode-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}.mode-button.active{background:#006d77;color:#fff;border-color:#00545c}.capture-panel{border-top:1px solid #bac8ce;padding-top:10px}.label-row{display:grid;grid-template-columns:1fr 120px;gap:10px;margin-bottom:10px}.label-input{width:100%;min-height:44px;border:2px solid #8a9da5;border-radius:8px;background:#fff;color:#081116;padding:0 10px;font:inherit}.capture-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.capture-actions{display:flex;gap:8px;align-items:center}.capture-head strong{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#32434b}.capture-download,.capture-clear{display:inline-flex;align-items:center;justify-content:center;min-height:38px;border:2px solid #8799a3;border-radius:8px;padding:0 10px;color:#081116;text-decoration:none;font-weight:800;background:#f8fbfc}.capture-clear{color:#64210f;border-color:#b84f2c}.capture-latest{white-space:pre-wrap;max-height:220px;overflow:auto;margin:0;background:#eef4f6;border:1px solid #bac8ce;border-radius:6px;padding:10px;font:12px ui-monospace,SFMono-Regular,Consolas,monospace}");
     html += F(".controls{position:sticky;top:0;z-index:3;background:#e8edf0;padding:8px 0 12px;border-bottom:2px solid #bac8ce;margin-bottom:14px}");
     html += F(".search-row{display:grid;grid-template-columns:1fr 86px;gap:10px}.search{width:100%;min-height:48px;border:2px solid #8a9da5;border-radius:8px;background:#fff;color:#081116;padding:0 12px;font:inherit}");
     html += F(".filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;padding:10px 0 0}.filter{width:100%;min-height:44px;white-space:nowrap;padding:0 12px}.filter.active{background:#006d77;color:#fff;border-color:#00545c}");
@@ -227,8 +251,8 @@ class RemoteWebDashboard {
     html += F("body[data-mode='capture'] .command-button,body[data-mode='capture'] .sweep button{opacity:.48;cursor:not-allowed}");
     html += F(".remote-command button{min-height:60px;padding:8px 6px}.remote-command.power button{background:#fff0e8;border-color:#b84f2c;color:#64210f}.remote-command.nav button{background:#e8f0ff;border-color:#8aa4d6}.remote-command.light button{background:#fff8d9;border-color:#b79c25}");
     html += F(".command-label{display:block}.tag{display:block;font-size:11px;font-weight:650;color:#30444d;margin-top:3px}.empty{border:2px dashed #7f939c;border-radius:8px;padding:18px;text-align:center;color:#33464f;background:#fff}.sweep{margin:22px auto 0;max-width:360px}.sweep button{background:#fff0d4;border-color:#b47811}");
-    html += F("@media (max-width:680px){body{padding:10px}.top{grid-template-columns:1fr}.search-row{grid-template-columns:1fr 78px}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.remote-card{padding:12px;scroll-margin-top:156px}.remote-grid,.bottom-grid,.effect-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.utility-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.remote-group.nav .remote-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.status{min-width:0}}");
-    html += F("@media (prefers-color-scheme:dark){:root{scrollbar-color:#87a5af #182225}:root,body{background:#0c1113;color:#f3f8f9}.controls{background:#0c1113;border-color:#34454c}.status,.mode-panel,.brand-card,.remote-card,.empty{background:#172022;border-color:#52656d}.search{background:#172022;color:#f3f8f9;border-color:#61757e}.meta,.tag,.stage-title,.remote-group-title,.capture-head strong{color:#c4d4d9}button{background:#263438;color:#f3f8f9;border-color:#61757e}button:hover{background:#34464c}.filter.active,.brand-card.active,.mode-button.active{background:#0f6e78;border-color:#75ccd4;color:#fff}.pill{background:#24393e;color:#def8fb;border-color:#61757e}.capture-download{color:#f3f8f9;border-color:#61757e}.capture-latest{background:#101719;border-color:#52656d;color:#e8f4f7}.remote-command.power button{background:#422418;border-color:#c87556;color:#ffd8ca}.remote-command.nav button{background:#1c2b42}.remote-command.light button{background:#3c3412}.sweep button{background:#3d2c10;border-color:#a27a25}}");
+    html += F("@media (max-width:680px){body{padding:10px}.top{grid-template-columns:1fr}.label-row,.search-row{grid-template-columns:1fr}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.remote-card{padding:12px;scroll-margin-top:156px}.remote-grid,.bottom-grid,.effect-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.utility-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.remote-group.nav .remote-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.status{min-width:0}}");
+    html += F("@media (prefers-color-scheme:dark){:root{scrollbar-color:#87a5af #182225}:root,body{background:#0c1113;color:#f3f8f9}.controls{background:#0c1113;border-color:#34454c}.status,.mode-panel,.brand-card,.remote-card,.empty{background:#172022;border-color:#52656d}.search,.label-input{background:#172022;color:#f3f8f9;border-color:#61757e}.meta,.tag,.stage-title,.remote-group-title,.capture-head strong{color:#c4d4d9}button{background:#263438;color:#f3f8f9;border-color:#61757e}button:hover{background:#34464c}.filter.active,.brand-card.active,.mode-button.active{background:#0f6e78;border-color:#75ccd4;color:#fff}.pill{background:#24393e;color:#def8fb;border-color:#61757e}.capture-download{color:#f3f8f9;border-color:#61757e;background:#263438}.capture-clear{background:#422418;border-color:#c87556;color:#ffd8ca}.capture-latest{background:#101719;border-color:#52656d;color:#e8f4f7}.remote-command.power button{background:#422418;border-color:#c87556;color:#ffd8ca}.remote-command.nav button{background:#1c2b42}.remote-command.light button{background:#3c3412}.sweep button{background:#3d2c10;border-color:#a27a25}}");
     html += F("</style>");
     appendDashboardScript(html);
     html += F("</head><body><div class='shell'><header class='top'><h1>IR Remote</h1><div class='status'><strong>Status</strong><p id='statusText'>");
@@ -266,8 +290,13 @@ class RemoteWebDashboard {
     html += F("<section class='mode-panel'><div class='mode-row'>");
     html += F("<button id='modeSend' class='mode-button' type='button' data-mode-url='/mode?mode=send' onclick=\"setMode('send')\">Senden</button>");
     html += F("<button id='modeCapture' class='mode-button' type='button' data-mode-url='/mode?mode=capture' onclick=\"setMode('capture')\">Einlesen</button>");
-    html += F("</div><div class='capture-panel'><div class='capture-head'><strong>Letzter Empfang</strong>");
-    html += F("<a class='capture-download' href='/captures/download' download>Download</a></div>");
+    html += F("</div><div class='capture-panel'><div class='label-row'>");
+    html += F("<input id='captureLabel' class='label-input' type='text' maxlength='64' placeholder='Capture-Titel' value='");
+    appendEscaped(html, receiver_.captureLabel().c_str());
+    html += F("'><button type='button' onclick='setCaptureLabel()'>Titel setzen</button></div>");
+    html += F("<div class='capture-head'><strong>Letzter Empfang</strong><div class='capture-actions'>");
+    html += F("<a class='capture-download' href='/captures/download' download>Download</a>");
+    html += F("<button class='capture-clear' type='button' onclick='clearCaptures()'>Loeschen</button></div></div>");
     html += F("<pre id='captureLatest' class='capture-latest'>");
     appendEscaped(html, receiver_.latestCaptureSummary().c_str());
     html += F("</pre></div></section>");
@@ -769,9 +798,11 @@ class RemoteWebDashboard {
     html += F("function forEachMatch(selector,callback){var nodes=document.querySelectorAll(selector);for(var i=0;i<nodes.length;i++){callback(nodes[i]);}}");
     html += F("function dataOf(element,name){return element.getAttribute('data-'+name)||'';}");
     html += F("function setHidden(element,hidden){if(!element){return;}element.hidden=hidden;if(hidden){element.setAttribute('hidden','')}else{element.removeAttribute('hidden')}}");
-    html += F("function applyModeStatus(data){if(!data){return;}activeMode=data.mode||'send';if(document.body){document.body.setAttribute('data-mode',activeMode);}var latest=document.getElementById('captureLatest');if(latest&&data.latest){latest.textContent=data.latest;}var send=document.getElementById('modeSend');var capture=document.getElementById('modeCapture');if(send){send.classList.toggle('active',activeMode==='send')}if(capture){capture.classList.toggle('active',activeMode==='capture')}}");
+    html += F("function applyModeStatus(data){if(!data){return;}activeMode=data.mode||'send';if(document.body){document.body.setAttribute('data-mode',activeMode);}var latest=document.getElementById('captureLatest');if(latest&&data.latest){latest.textContent=data.latest;}var label=document.getElementById('captureLabel');if(label&&document.activeElement!==label&&typeof data.label!=='undefined'){label.value=data.label;}var send=document.getElementById('modeSend');var capture=document.getElementById('modeCapture');if(send){send.classList.toggle('active',activeMode==='send')}if(capture){capture.classList.toggle('active',activeMode==='capture')}}");
     html += F("function refreshCaptureStatus(){if(typeof fetch==='undefined'){return;}fetch('/capture/status').then(function(response){return response.json();}).then(applyModeStatus).catch(function(){});}");
     html += F("function setMode(mode){if(typeof fetch==='undefined'){window.location='/mode?mode='+mode;return;}fetch('/mode?mode='+mode,{method:'POST'}).then(function(response){return response.json();}).then(function(data){applyModeStatus(data);setStatus(mode==='capture'?'Einlesen aktiv':'Senden aktiv');}).catch(function(){setStatus('Moduswechsel fehlgeschlagen');});}");
+    html += F("function setCaptureLabel(){var label=document.getElementById('captureLabel');var value=label?label.value:'';if(typeof fetch==='undefined'){window.location='/capture/label?label='+encodeURIComponent(value);return;}fetch('/capture/label?label='+encodeURIComponent(value),{method:'POST'}).then(function(response){return response.json();}).then(function(data){applyModeStatus(data);setStatus('Capture-Titel gesetzt');}).catch(function(){setStatus('Titel konnte nicht gesetzt werden');});}");
+    html += F("function clearCaptures(){if(!confirm('Alle gespeicherten Captures loeschen?')){return;}if(typeof fetch==='undefined'){window.location='/captures/clear';return;}fetch('/captures/clear',{method:'POST'}).then(function(response){return response.json();}).then(function(data){applyModeStatus(data);setStatus('Capture-Log geloescht');}).catch(function(){setStatus('Capture-Log konnte nicht geloescht werden');});}");
     html += F("function filterCategory(category,button){activeCategory=category;activeProfile='';forEachMatch('.filter',function(item){item.classList.remove('active')});button.classList.add('active');forEachMatch('.brand-card',function(item){item.classList.remove('active')});applyFilters();}");
     html += F("function selectProfile(profileIndex,button){activeProfile=String(profileIndex);forEachMatch('.brand-card',function(item){item.classList.remove('active')});button.classList.add('active');applyFilters();var card=document.querySelector(\".remote-card[data-profile-index='\"+activeProfile+\"']\");if(card){card.scrollIntoView({block:'start',behavior:'smooth'});}}");
     html += F("function clearSearch(){document.getElementById('search').value='';activeCategory='';activeProfile='';forEachMatch('.filter,.brand-card',function(item){item.classList.remove('active')});applyFilters();}");

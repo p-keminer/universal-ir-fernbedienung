@@ -15,8 +15,8 @@ class CaptureStorage {
     return mounted_;
   }
 
-  bool append(const uint32_t timestampMs, const String& humanReadable,
-              const String& sourceCode) {
+  bool append(const uint32_t timestampMs, const String& label,
+              const String& humanReadable, const String& sourceCode) {
     if (!mounted_) {
       return false;
     }
@@ -27,6 +27,8 @@ class CaptureStorage {
     }
 
     file.println(F("----- IR Capture -----"));
+    file.print(F("Titel: "));
+    file.println(label);
     file.print(F("Zeit ms: "));
     file.println(timestampMs);
     file.print(humanReadable);
@@ -34,6 +36,12 @@ class CaptureStorage {
     file.println(F("----------------------"));
     file.println();
     return true;
+  }
+
+  bool append(const uint32_t timestampMs, const String& humanReadable,
+              const String& sourceCode) {
+    const String fallbackLabel = F("Ohne Titel");
+    return append(timestampMs, fallbackLabel, humanReadable, sourceCode);
   }
 
   bool printTo(Stream& output) {
@@ -84,6 +92,18 @@ class CaptureStorage {
 
     server.streamFile(file, "text/plain");
     return true;
+  }
+
+  bool clear() {
+    if (!mounted_) {
+      return false;
+    }
+
+    if (!FFat.exists(kCaptureLogPath)) {
+      return true;
+    }
+
+    return FFat.remove(kCaptureLogPath);
   }
 
  private:

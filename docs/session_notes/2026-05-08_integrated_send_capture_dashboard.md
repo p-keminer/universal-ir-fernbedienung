@@ -19,8 +19,11 @@ Neue Bedienung im Dashboard:
 
 - Button `Senden`
 - Button `Einlesen`
+- Freies Textfeld `Capture-Titel`
+- Button `Titel setzen`
 - Bereich `Letzter Empfang`
 - Download-Link fuer `/captures/download`
+- Loesch-Button fuer `/captures/clear`
 
 Neue Routen:
 
@@ -29,7 +32,11 @@ Neue Routen:
 | `/mode?mode=send` | Senden aktivieren |
 | `/mode?mode=capture` | Einlesen aktivieren |
 | `/capture/status` | Modus und letzter Capture als JSON |
+| `/capture/label` | frei eingetragenen Capture-Titel setzen |
 | `/captures/download` | Capture-Log herunterladen |
+| `/captures/clear` | Capture-Log nach Bestaetigung loeschen |
+
+Der aktive Titel wird mit jedem neu empfangenen Code als `Titel:` in das Log geschrieben.
 
 ## Flash-Stand
 

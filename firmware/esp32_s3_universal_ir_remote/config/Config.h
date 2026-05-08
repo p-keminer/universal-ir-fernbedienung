@@ -17,6 +17,7 @@ constexpr uint16_t kPostSendStatusMs = 700;
 constexpr uint16_t kCaptureBufferSize = 1024;
 constexpr uint8_t kCaptureTimeoutMs = 15;
 constexpr uint16_t kMinUnknownSize = 12;
+constexpr uint8_t kCaptureLabelMaxLength = 64;
 
 constexpr const char* kWifiApSsid = "IR-Remote";
 constexpr const char* kWifiApPassword = "irremote";

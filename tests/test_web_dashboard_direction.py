@@ -122,12 +122,16 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "handleMode",
             "handleCaptureStatus",
             "handleCaptureDownload",
+            "handleCaptureLabel",
+            "handleCaptureClear",
             '"/"',
             '"/send"',
             '"/sweep"',
             '"/mode"',
             '"/capture/status"',
             '"/captures/download"',
+            '"/capture/label"',
+            '"/captures/clear"',
         ):
             self.assertIn(expected, dashboard)
 
@@ -155,6 +159,9 @@ class WebDashboardDirectionTest(unittest.TestCase):
         self.assertIn("IRrecv irrecv_", receiver)
         self.assertIn("setMode", receiver)
         self.assertIn("latestCaptureSummary", receiver)
+        self.assertIn("captureLabel", receiver)
+        self.assertIn("setCaptureLabel", receiver)
+        self.assertIn("Titel: ", receiver)
         self.assertIn("captureStorage_", receiver)
         self.assertIn("captureReceiver.begin()", sketch)
         self.assertIn("captureReceiver.update()", sketch)
@@ -164,9 +171,16 @@ class WebDashboardDirectionTest(unittest.TestCase):
         self.assertIn("id='modeSend'", dashboard)
         self.assertIn("id='modeCapture'", dashboard)
         self.assertIn("id='captureLatest'", dashboard)
+        self.assertIn("id='captureLabel'", dashboard)
+        self.assertIn("setCaptureLabel", dashboard)
+        self.assertIn("label", dashboard)
         self.assertIn("refreshCaptureStatus", dashboard)
         self.assertIn("download", dashboard)
         self.assertIn("appendDownloadTo", storage)
+        self.assertIn("clear()", storage)
+        self.assertIn("FFat.remove", storage)
+        self.assertIn("const String& label", storage)
+        self.assertIn('file.print(F("Titel: "))', storage)
         self.assertIn("Senden und Einlesen", firmware)
 
     def test_dashboard_has_filterable_testing_ui(self):

@@ -54,12 +54,14 @@ class IntegratedIrReceiver {
     }
 
     const uint32_t now = millis();
+    const String label = captureLabel_;
     const String humanReadable = resultToHumanReadableBasic(&results_);
     const String sourceCode = resultToSourceCode(&results_);
-    const bool stored = captureStorage_.append(now, humanReadable, sourceCode);
+    const bool stored =
+        captureStorage_.append(now, label, humanReadable, sourceCode);
 
-    printCapture(now, humanReadable, sourceCode, stored);
-    updateLatestCapture(now, humanReadable, sourceCode, stored);
+    printCapture(now, label, humanReadable, sourceCode, stored);
+    updateLatestCapture(now, label, humanReadable, sourceCode, stored);
 
     if (statusLed_ != nullptr) {
       if (stored) {
@@ -101,6 +103,26 @@ class IntegratedIrReceiver {
     return mode_ == OperationMode::Capture;
   }
 
+  void setCaptureLabel(const String& label) {
+    captureLabel_ = label;
+    captureLabel_.trim();
+
+    if (captureLabel_.length() == 0) {
+      captureLabel_ = F("Ohne Titel");
+    }
+
+    if (captureLabel_.length() > config::kCaptureLabelMaxLength) {
+      captureLabel_.remove(config::kCaptureLabelMaxLength);
+    }
+
+    Serial.print(F("Capture-Titel: "));
+    Serial.println(captureLabel_);
+  }
+
+  const String& captureLabel() const {
+    return captureLabel_;
+  }
+
   const String& latestCaptureSummary() const {
     return latestCaptureSummary_;
   }
@@ -114,10 +136,21 @@ class IntegratedIrReceiver {
     return captureStorage_.appendDownloadTo(server);
   }
 
+  bool clearCaptures() {
+    const bool cleared = captureStorage_.clear();
+    if (cleared) {
+      latestCaptureSummary_ = F("Capture-Log geloescht.");
+    }
+    return cleared;
+  }
+
  private:
-  void printCapture(const uint32_t now, const String& humanReadable,
-                    const String& sourceCode, const bool stored) const {
+  void printCapture(const uint32_t now, const String& label,
+                    const String& humanReadable, const String& sourceCode,
+                    const bool stored) const {
     Serial.println(F("----- IR Capture -----"));
+    Serial.print(F("Titel: "));
+    Serial.println(label);
     Serial.print(F("Zeit ms: "));
     Serial.println(now);
 
@@ -134,9 +167,12 @@ class IntegratedIrReceiver {
     Serial.println();
   }
 
-  void updateLatestCapture(const uint32_t now, const String& humanReadable,
+  void updateLatestCapture(const uint32_t now, const String& label,
+                           const String& humanReadable,
                            const String& sourceCode, const bool stored) {
-    latestCaptureSummary_ = F("Zeit ms: ");
+    latestCaptureSummary_ = F("Titel: ");
+    latestCaptureSummary_ += label;
+    latestCaptureSummary_ += F("\nZeit ms: ");
     latestCaptureSummary_ += String(now);
     latestCaptureSummary_ += F("\n");
     latestCaptureSummary_ += stored ? F("Gespeichert: ja\n")
@@ -151,6 +187,7 @@ class IntegratedIrReceiver {
   status_led::StatusLed* statusLed_;
   OperationMode mode_ = OperationMode::Send;
   bool storageReady_ = false;
+  String captureLabel_ = F("Ohne Titel");
   String latestCaptureSummary_ = F("Noch kein Capture empfangen.");
 };
 

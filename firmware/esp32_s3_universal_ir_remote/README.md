@@ -61,6 +61,7 @@ Taster, Joystick und LCD1602 sind nicht Teil des v1-Defaults.
 | `/mode?mode=capture` | State Machine auf Einlesen stellen |
 | `/capture/status` | aktueller Modus und letzter Capture als JSON |
 | `/captures/download` | gespeicherte Captures als Textdatei herunterladen |
+| `/captures/clear` | gespeicherte Captures loeschen |
 
 ## Senden und Einlesen
 
@@ -68,9 +69,12 @@ Der Hauptsketch kann beide Betriebsarten ohne erneutes Flashen:
 
 - `Senden`: IR-Buttons und Diagnostic Sweep sind aktiv.
 - `Einlesen`: IR-Empfaenger ist aktiv, Senden wird blockiert.
+- Der Capture-Titel wird im Dashboard frei eingetragen und mit `Titel setzen` aktiviert.
+- Jeder danach empfangene Code wird mit diesem Titel protokolliert.
 - Der letzte empfangene Code erscheint im Dashboard im Bereich `Letzter Empfang`.
 - Alle Captures werden in der internen `FFat`-Datei `/ir_captures.log` gesammelt.
 - Die Datei kann ueber `Download` im Dashboard heruntergeladen werden.
+- Die Datei kann ueber `Loeschen` im Dashboard nach Bestaetigung entfernt werden.
 
 ## Naechste Firmware-Schritte
 
