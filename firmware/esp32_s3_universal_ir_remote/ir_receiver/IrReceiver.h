@@ -136,6 +136,19 @@ class IntegratedIrReceiver {
     return captureStorage_.appendDownloadTo(server);
   }
 
+  template <typename ServerT>
+  bool appendCaptureListTo(ServerT& server) {
+    return captureStorage_.sendListJsonTo(server);
+  }
+
+  bool deleteCaptureRecord(const uint16_t index) {
+    const bool deleted = captureStorage_.deleteRecord(index);
+    if (deleted) {
+      latestCaptureSummary_ = F("Capture geloescht.");
+    }
+    return deleted;
+  }
+
   bool clearCaptures() {
     const bool cleared = captureStorage_.clear();
     if (cleared) {

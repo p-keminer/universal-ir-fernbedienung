@@ -37,7 +37,8 @@ Er nutzt:
 Der Web-Sketch und der Capture-Sketch nutzen `GPIO15` als IR-Empfaenger-Eingang fuer `KY-022`, `VS1838B` oder kompatible 38-kHz-Receiver.
 Captures werden ueber Serial ausgegeben, im Dashboard angezeigt und in der internen `FFat`-Partition unter `/ir_captures.log` gespeichert.
 Im Web-Sketch kann jeder Capture vorher mit einem frei eingetragenen Titel beschriftet werden.
-Das Capture-Log kann im Dashboard heruntergeladen oder nach Bestaetigung geloescht werden.
+Das Dashboard trennt den Senden- und Einlesen-Modus sichtbar voneinander.
+Das Capture-Log kann im Dashboard heruntergeladen, als Liste durchsucht und einzeln oder komplett geloescht werden.
 
 ## RGB-Status
 

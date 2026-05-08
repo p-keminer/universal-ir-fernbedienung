@@ -49,6 +49,10 @@ class RemoteWebDashboard {
                [this]() { handleCaptureStatus(); });
     server_.on("/capture/label", HTTP_ANY,
                [this]() { handleCaptureLabel(); });
+    server_.on("/captures/list", HTTP_GET,
+               [this]() { handleCaptureList(); });
+    server_.on("/captures/delete", HTTP_ANY,
+               [this]() { handleCaptureDelete(); });
     server_.on("/captures/download", HTTP_GET,
                [this]() { handleCaptureDownload(); });
     server_.on("/captures/clear", HTTP_ANY,
@@ -162,6 +166,22 @@ class RemoteWebDashboard {
     receiver_.appendCaptureDownloadTo(server_);
   }
 
+  void handleCaptureList() {
+    receiver_.appendCaptureListTo(server_);
+  }
+
+  void handleCaptureDelete() {
+    uint16_t index = 0;
+    if (!parseUint16Arg("index", index)) {
+      server_.send(400, "text/plain", "index fehlt");
+      return;
+    }
+
+    lastStatus_ = receiver_.deleteCaptureRecord(index) ? F("Capture geloescht")
+                                                       : F("Capture fehlt");
+    sendCaptureStatusJson();
+  }
+
   void handleCaptureClear() {
     lastStatus_ = receiver_.clearCaptures() ? F("Capture-Log geloescht")
                                             : F("Capture-Log Fehler");
@@ -211,6 +231,33 @@ class RemoteWebDashboard {
     return true;
   }
 
+  bool parseUint16Arg(const char* name, uint16_t& value) {
+    if (!server_.hasArg(name)) {
+      return false;
+    }
+
+    const String raw = server_.arg(name);
+    if (raw.length() == 0 || raw.length() > 5) {
+      return false;
+    }
+
+    uint32_t parsed = 0;
+    for (uint8_t i = 0; i < raw.length(); ++i) {
+      const char c = raw.charAt(i);
+      if (c < '0' || c > '9') {
+        return false;
+      }
+
+      parsed = static_cast<uint32_t>((parsed * 10) + (c - '0'));
+      if (parsed > 65535) {
+        return false;
+      }
+    }
+
+    value = static_cast<uint16_t>(parsed);
+    return true;
+  }
+
   enum class CommandGroup : uint8_t {
     Power,
     VolumeChannel,
@@ -235,7 +282,7 @@ class RemoteWebDashboard {
     html += F(".shell{max-width:980px;margin:0 auto;padding-bottom:128px}.top{display:grid;grid-template-columns:1fr minmax(190px,280px);gap:12px;align-items:center;margin-bottom:10px}");
     html += F("h1{font-size:25px;line-height:1.05;margin:0}.status{border:2px solid #8a9da5;background:#fff;padding:9px 11px;border-radius:8px;min-width:0}");
     html += F(".status strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#32434b}.status p{margin:4px 0 0;min-height:20px}");
-    html += F(".mode-panel{border:2px solid #8a9da5;background:#fff;border-radius:8px;padding:10px 12px;margin:0 0 12px}.mode-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}.mode-button.active{background:#006d77;color:#fff;border-color:#00545c}.capture-panel{border-top:1px solid #bac8ce;padding-top:10px}.label-row{display:grid;grid-template-columns:1fr 120px;gap:10px;margin-bottom:10px}.label-input{width:100%;min-height:44px;border:2px solid #8a9da5;border-radius:8px;background:#fff;color:#081116;padding:0 10px;font:inherit}.capture-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.capture-actions{display:flex;gap:8px;align-items:center}.capture-head strong{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#32434b}.capture-download,.capture-clear{display:inline-flex;align-items:center;justify-content:center;min-height:38px;border:2px solid #8799a3;border-radius:8px;padding:0 10px;color:#081116;text-decoration:none;font-weight:800;background:#f8fbfc}.capture-clear{color:#64210f;border-color:#b84f2c}.capture-latest{white-space:pre-wrap;max-height:220px;overflow:auto;margin:0;background:#eef4f6;border:1px solid #bac8ce;border-radius:6px;padding:10px;font:12px ui-monospace,SFMono-Regular,Consolas,monospace}");
+    html += F(".mode-panel{border:2px solid #8a9da5;background:#fff;border-radius:8px;padding:10px 12px;margin:0 0 12px}.mode-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mode-button.active{background:#006d77;color:#fff;border-color:#00545c}.send-workspace[hidden],.capture-workspace[hidden]{display:none}.capture-workspace{border:2px solid #8a9da5;background:#fff;border-radius:8px;padding:12px;margin:0 0 24px}.label-row{display:grid;grid-template-columns:1fr 120px;gap:10px;margin-bottom:12px}.label-input{width:100%;min-height:44px;border:2px solid #8a9da5;border-radius:8px;background:#fff;color:#081116;padding:0 10px;font:inherit}.capture-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.capture-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.capture-head strong{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#32434b}.capture-download,.capture-clear,.capture-delete{display:inline-flex;align-items:center;justify-content:center;min-height:38px;border:2px solid #8799a3;border-radius:8px;padding:0 10px;color:#081116;text-decoration:none;font-weight:800;background:#f8fbfc}.capture-clear,.capture-delete{color:#64210f;border-color:#b84f2c}.capture-latest{white-space:pre-wrap;max-height:150px;overflow:auto;margin:0 0 12px;background:#eef4f6;border:1px solid #bac8ce;border-radius:6px;padding:10px;font:12px ui-monospace,SFMono-Regular,Consolas,monospace}.capture-list{max-height:54vh;overflow:auto;display:grid;gap:10px;padding-right:4px}.capture-record{border:1px solid #9eb2ba;border-radius:8px;background:#f8fbfc;padding:10px}.capture-record-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.capture-record-title{font-weight:800}.capture-record-time{font-size:12px;color:#33464f}.capture-record pre{white-space:pre-wrap;margin:0;font:12px ui-monospace,SFMono-Regular,Consolas,monospace}");
     html += F(".controls{position:sticky;top:0;z-index:3;background:#e8edf0;padding:8px 0 12px;border-bottom:2px solid #bac8ce;margin-bottom:14px}");
     html += F(".search-row{display:grid;grid-template-columns:1fr 86px;gap:10px}.search{width:100%;min-height:48px;border:2px solid #8a9da5;border-radius:8px;background:#fff;color:#081116;padding:0 12px;font:inherit}");
     html += F(".filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;padding:10px 0 0}.filter{width:100%;min-height:44px;white-space:nowrap;padding:0 12px}.filter.active{background:#006d77;color:#fff;border-color:#00545c}");
@@ -252,14 +299,14 @@ class RemoteWebDashboard {
     html += F(".remote-command button{min-height:60px;padding:8px 6px}.remote-command.power button{background:#fff0e8;border-color:#b84f2c;color:#64210f}.remote-command.nav button{background:#e8f0ff;border-color:#8aa4d6}.remote-command.light button{background:#fff8d9;border-color:#b79c25}");
     html += F(".command-label{display:block}.tag{display:block;font-size:11px;font-weight:650;color:#30444d;margin-top:3px}.empty{border:2px dashed #7f939c;border-radius:8px;padding:18px;text-align:center;color:#33464f;background:#fff}.sweep{margin:22px auto 0;max-width:360px}.sweep button{background:#fff0d4;border-color:#b47811}");
     html += F("@media (max-width:680px){body{padding:10px}.top{grid-template-columns:1fr}.label-row,.search-row{grid-template-columns:1fr}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.remote-card{padding:12px;scroll-margin-top:156px}.remote-grid,.bottom-grid,.effect-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.utility-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.remote-group.nav .remote-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.status{min-width:0}}");
-    html += F("@media (prefers-color-scheme:dark){:root{scrollbar-color:#87a5af #182225}:root,body{background:#0c1113;color:#f3f8f9}.controls{background:#0c1113;border-color:#34454c}.status,.mode-panel,.brand-card,.remote-card,.empty{background:#172022;border-color:#52656d}.search,.label-input{background:#172022;color:#f3f8f9;border-color:#61757e}.meta,.tag,.stage-title,.remote-group-title,.capture-head strong{color:#c4d4d9}button{background:#263438;color:#f3f8f9;border-color:#61757e}button:hover{background:#34464c}.filter.active,.brand-card.active,.mode-button.active{background:#0f6e78;border-color:#75ccd4;color:#fff}.pill{background:#24393e;color:#def8fb;border-color:#61757e}.capture-download{color:#f3f8f9;border-color:#61757e;background:#263438}.capture-clear{background:#422418;border-color:#c87556;color:#ffd8ca}.capture-latest{background:#101719;border-color:#52656d;color:#e8f4f7}.remote-command.power button{background:#422418;border-color:#c87556;color:#ffd8ca}.remote-command.nav button{background:#1c2b42}.remote-command.light button{background:#3c3412}.sweep button{background:#3d2c10;border-color:#a27a25}}");
+    html += F("@media (prefers-color-scheme:dark){:root{scrollbar-color:#87a5af #182225}:root,body{background:#0c1113;color:#f3f8f9}.controls{background:#0c1113;border-color:#34454c}.status,.mode-panel,.capture-workspace,.brand-card,.remote-card,.empty{background:#172022;border-color:#52656d}.search,.label-input{background:#172022;color:#f3f8f9;border-color:#61757e}.meta,.tag,.stage-title,.remote-group-title,.capture-head strong,.capture-record-time{color:#c4d4d9}button{background:#263438;color:#f3f8f9;border-color:#61757e}button:hover{background:#34464c}.filter.active,.brand-card.active,.mode-button.active{background:#0f6e78;border-color:#75ccd4;color:#fff}.pill{background:#24393e;color:#def8fb;border-color:#61757e}.capture-download{color:#f3f8f9;border-color:#61757e;background:#263438}.capture-clear,.capture-delete{background:#422418;border-color:#c87556;color:#ffd8ca}.capture-latest,.capture-record{background:#101719;border-color:#52656d;color:#e8f4f7}.remote-command.power button{background:#422418;border-color:#c87556;color:#ffd8ca}.remote-command.nav button{background:#1c2b42}.remote-command.light button{background:#3c3412}.sweep button{background:#3d2c10;border-color:#a27a25}}");
     html += F("</style>");
     appendDashboardScript(html);
     html += F("</head><body><div class='shell'><header class='top'><h1>IR Remote</h1><div class='status'><strong>Status</strong><p id='statusText'>");
     appendEscaped(html, lastStatus_.c_str());
     html += F("</p></div></header>");
     appendModePanel(html);
-    html += F("<section class='controls'><div class='search-row'><input id='search' class='search' type='search' placeholder='Profil oder Befehl suchen' oninput='applyFilters()'><button type='button' onclick='clearSearch()'>Reset</button></div><div class='filters'>");
+    html += F("<section id='sendWorkspace' class='send-workspace'><section class='controls'><div class='search-row'><input id='search' class='search' type='search' placeholder='Profil oder Befehl suchen' oninput='applyFilters()'><button type='button' onclick='clearSearch()'>Reset</button></div><div class='filters'>");
     appendCategoryFilter(html, "tv", F("TV"));
     appendCategoryFilter(html, "media", F("Media"));
     appendCategoryFilter(html, "led", F("LED Strip"));
@@ -282,6 +329,8 @@ class RemoteWebDashboard {
 
     html += F("</main><form class='sweep' method='post' action='/sweep'>");
     html += F("<button type='submit' onclick=\"return confirm('Diagnostic Sweep sendet mehrere Codes. Fortfahren?')\">Diagnostic Sweep</button></form>");
+    html += F("</section>");
+    appendCaptureWorkspace(html);
     html += F("</div></body></html>");
     return html;
   }
@@ -290,16 +339,20 @@ class RemoteWebDashboard {
     html += F("<section class='mode-panel'><div class='mode-row'>");
     html += F("<button id='modeSend' class='mode-button' type='button' data-mode-url='/mode?mode=send' onclick=\"setMode('send')\">Senden</button>");
     html += F("<button id='modeCapture' class='mode-button' type='button' data-mode-url='/mode?mode=capture' onclick=\"setMode('capture')\">Einlesen</button>");
-    html += F("</div><div class='capture-panel'><div class='label-row'>");
+    html += F("</div></section>");
+  }
+
+  void appendCaptureWorkspace(String& html) const {
+    html += F("<section id='captureWorkspace' class='capture-workspace' hidden><div class='label-row'>");
     html += F("<input id='captureLabel' class='label-input' type='text' maxlength='64' placeholder='Capture-Titel' value='");
     appendEscaped(html, receiver_.captureLabel().c_str());
     html += F("'><button type='button' onclick='setCaptureLabel()'>Titel setzen</button></div>");
-    html += F("<div class='capture-head'><strong>Letzter Empfang</strong><div class='capture-actions'>");
+    html += F("<div class='capture-head'><strong>Empfangene Signale</strong><div class='capture-actions'>");
     html += F("<a class='capture-download' href='/captures/download' download>Download</a>");
-    html += F("<button class='capture-clear' type='button' onclick='clearCaptures()'>Loeschen</button></div></div>");
+    html += F("<button class='capture-clear' type='button' onclick='clearAllCaptures()'>Alle Captures loeschen</button></div></div>");
     html += F("<pre id='captureLatest' class='capture-latest'>");
     appendEscaped(html, receiver_.latestCaptureSummary().c_str());
-    html += F("</pre></div></section>");
+    html += F("</pre><div id='captureList' class='capture-list'></div></section>");
   }
 
   void appendProfileOption(String& html, const uint8_t profileIndex) const {
@@ -798,18 +851,21 @@ class RemoteWebDashboard {
     html += F("function forEachMatch(selector,callback){var nodes=document.querySelectorAll(selector);for(var i=0;i<nodes.length;i++){callback(nodes[i]);}}");
     html += F("function dataOf(element,name){return element.getAttribute('data-'+name)||'';}");
     html += F("function setHidden(element,hidden){if(!element){return;}element.hidden=hidden;if(hidden){element.setAttribute('hidden','')}else{element.removeAttribute('hidden')}}");
-    html += F("function applyModeStatus(data){if(!data){return;}activeMode=data.mode||'send';if(document.body){document.body.setAttribute('data-mode',activeMode);}var latest=document.getElementById('captureLatest');if(latest&&data.latest){latest.textContent=data.latest;}var label=document.getElementById('captureLabel');if(label&&document.activeElement!==label&&typeof data.label!=='undefined'){label.value=data.label;}var send=document.getElementById('modeSend');var capture=document.getElementById('modeCapture');if(send){send.classList.toggle('active',activeMode==='send')}if(capture){capture.classList.toggle('active',activeMode==='capture')}}");
+    html += F("function applyModeStatus(data){if(!data){return;}activeMode=data.mode||'send';if(document.body){document.body.setAttribute('data-mode',activeMode);}setHidden(document.getElementById('sendWorkspace'),activeMode!=='send');setHidden(document.getElementById('captureWorkspace'),activeMode!=='capture');var latest=document.getElementById('captureLatest');if(latest&&data.latest){latest.textContent=data.latest;}var label=document.getElementById('captureLabel');if(label&&document.activeElement!==label&&typeof data.label!=='undefined'){label.value=data.label;}var send=document.getElementById('modeSend');var capture=document.getElementById('modeCapture');if(send){send.classList.toggle('active',activeMode==='send')}if(capture){capture.classList.toggle('active',activeMode==='capture')}if(activeMode==='capture'){refreshCaptureList();}}");
     html += F("function refreshCaptureStatus(){if(typeof fetch==='undefined'){return;}fetch('/capture/status').then(function(response){return response.json();}).then(applyModeStatus).catch(function(){});}");
+    html += F("function renderCaptureList(data){var list=document.getElementById('captureList');if(!list){return;}while(list.firstChild){list.removeChild(list.firstChild);}var records=(data&&data.records)?data.records:[];if(records.length===0){var empty=document.createElement('div');empty.className='empty';empty.textContent='Noch keine Captures gespeichert.';list.appendChild(empty);return;}for(var i=records.length-1;i>=0;i--){var rec=records[i];var card=document.createElement('article');card.className='capture-record';var head=document.createElement('div');head.className='capture-record-head';var title=document.createElement('div');title.className='capture-record-title';title.textContent=rec.label||'Ohne Titel';var actions=document.createElement('div');actions.className='capture-actions';var time=document.createElement('span');time.className='capture-record-time';time.textContent=rec.time?('ms '+rec.time):'';var del=document.createElement('button');del.className='capture-delete';del.type='button';del.textContent='Loeschen';del.setAttribute('data-index',rec.index);del.onclick=function(){deleteCapture(this.getAttribute('data-index'));};actions.appendChild(time);actions.appendChild(del);head.appendChild(title);head.appendChild(actions);var body=document.createElement('pre');body.textContent=rec.text||'';card.appendChild(head);card.appendChild(body);list.appendChild(card);}}");
+    html += F("function refreshCaptureList(){if(typeof fetch==='undefined'){return;}fetch('/captures/list').then(function(response){return response.json();}).then(renderCaptureList).catch(function(){});}");
     html += F("function setMode(mode){if(typeof fetch==='undefined'){window.location='/mode?mode='+mode;return;}fetch('/mode?mode='+mode,{method:'POST'}).then(function(response){return response.json();}).then(function(data){applyModeStatus(data);setStatus(mode==='capture'?'Einlesen aktiv':'Senden aktiv');}).catch(function(){setStatus('Moduswechsel fehlgeschlagen');});}");
     html += F("function setCaptureLabel(){var label=document.getElementById('captureLabel');var value=label?label.value:'';if(typeof fetch==='undefined'){window.location='/capture/label?label='+encodeURIComponent(value);return;}fetch('/capture/label?label='+encodeURIComponent(value),{method:'POST'}).then(function(response){return response.json();}).then(function(data){applyModeStatus(data);setStatus('Capture-Titel gesetzt');}).catch(function(){setStatus('Titel konnte nicht gesetzt werden');});}");
-    html += F("function clearCaptures(){if(!confirm('Alle gespeicherten Captures loeschen?')){return;}if(typeof fetch==='undefined'){window.location='/captures/clear';return;}fetch('/captures/clear',{method:'POST'}).then(function(response){return response.json();}).then(function(data){applyModeStatus(data);setStatus('Capture-Log geloescht');}).catch(function(){setStatus('Capture-Log konnte nicht geloescht werden');});}");
+    html += F("function deleteCapture(index){if(!confirm('Diesen Capture loeschen?')){return;}fetch('/captures/delete?index='+index,{method:'POST'}).then(function(response){return response.json();}).then(function(data){applyModeStatus(data);refreshCaptureList();setStatus('Capture geloescht');}).catch(function(){setStatus('Capture konnte nicht geloescht werden');});}");
+    html += F("function clearAllCaptures(){if(!confirm('Alle gespeicherten Captures loeschen?')){return;}if(typeof fetch==='undefined'){window.location='/captures/clear';return;}fetch('/captures/clear',{method:'POST'}).then(function(response){return response.json();}).then(function(data){applyModeStatus(data);refreshCaptureList();setStatus('Capture-Log geloescht');}).catch(function(){setStatus('Capture-Log konnte nicht geloescht werden');});}");
     html += F("function filterCategory(category,button){activeCategory=category;activeProfile='';forEachMatch('.filter',function(item){item.classList.remove('active')});button.classList.add('active');forEachMatch('.brand-card',function(item){item.classList.remove('active')});applyFilters();}");
     html += F("function selectProfile(profileIndex,button){activeProfile=String(profileIndex);forEachMatch('.brand-card',function(item){item.classList.remove('active')});button.classList.add('active');applyFilters();var card=document.querySelector(\".remote-card[data-profile-index='\"+activeProfile+\"']\");if(card){card.scrollIntoView({block:'start',behavior:'smooth'});}}");
     html += F("function clearSearch(){document.getElementById('search').value='';activeCategory='';activeProfile='';forEachMatch('.filter,.brand-card',function(item){item.classList.remove('active')});applyFilters();}");
     html += F("function applyFilters(){var search=document.getElementById('search');var query=normalize(search?search.value:'');var hasCategory=activeCategory!=='';var picker=document.getElementById('profilePicker');var visibleProfiles=0;forEachMatch('.brand-card',function(card){var categoryOk=hasCategory&&dataOf(card,'category')===activeCategory;var text=normalize(dataOf(card,'search'));var showCard=categoryOk&&(!query||text.indexOf(query)!==-1);setHidden(card,!showCard);if(!showCard){card.classList.remove('active')}if(showCard){visibleProfiles++;}});setHidden(picker,!hasCategory);if(activeProfile!==''){var activeButton=document.querySelector(\".brand-card[data-profile-index='\"+activeProfile+\"']\");if(!activeButton||activeButton.hidden||dataOf(activeButton,'category')!==activeCategory){activeProfile='';}}forEachMatch('.remote-card',function(card){setHidden(card,!(hasCategory&&activeProfile!==''&&dataOf(card,'profile-index')===activeProfile));});setHidden(document.getElementById('emptyState'),!hasCategory||visibleProfiles!==0);}");
     html += F("function confirmCommand(form){var name=normalize(dataOf(form,'command-name'));if(name.indexOf('power')!==-1||name==='off'||name.indexOf(' off')!==-1){return confirm('Power/Off wirklich senden?')}return true;}");
     html += F("function sendCommand(form){if(activeMode!=='send'){setStatus('Erst Senden-Modus aktivieren');return false;}if(!confirmCommand(form)){return false;}if(typeof fetch==='undefined'||typeof FormData==='undefined'||typeof URLSearchParams==='undefined'){return true;}var data=new URLSearchParams(new FormData(form));var profile=dataOf(form,'profile-name')||'Profil';var command=dataOf(form,'command-name')||'Befehl';setStatus(profile+' / '+command+' sendet...');fetch(form.action,{method:'POST',body:data}).then(function(response){setStatus(response.ok?profile+' / '+command+' gesendet':'Sendefehler');}).catch(function(){setStatus('Sendefehler');});return false;}");
-    html += F("document.addEventListener('DOMContentLoaded',function(){applyFilters();refreshCaptureStatus();setInterval(refreshCaptureStatus,1500);});");
+    html += F("document.addEventListener('DOMContentLoaded',function(){applyFilters();refreshCaptureStatus();refreshCaptureList();setInterval(refreshCaptureStatus,1500);setInterval(function(){if(activeMode==='capture'){refreshCaptureList();}},2500);});");
     html += F("</script>");
   }
 

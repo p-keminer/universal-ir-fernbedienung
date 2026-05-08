@@ -124,6 +124,8 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "handleCaptureDownload",
             "handleCaptureLabel",
             "handleCaptureClear",
+            "handleCaptureList",
+            "handleCaptureDelete",
             '"/"',
             '"/send"',
             '"/sweep"',
@@ -132,6 +134,8 @@ class WebDashboardDirectionTest(unittest.TestCase):
             '"/captures/download"',
             '"/capture/label"',
             '"/captures/clear"',
+            '"/captures/list"',
+            '"/captures/delete"',
         ):
             self.assertIn(expected, dashboard)
 
@@ -177,11 +181,35 @@ class WebDashboardDirectionTest(unittest.TestCase):
         self.assertIn("refreshCaptureStatus", dashboard)
         self.assertIn("download", dashboard)
         self.assertIn("appendDownloadTo", storage)
+        self.assertIn("sendListJsonTo", storage)
+        self.assertIn("deleteRecord", storage)
+        self.assertIn("records", storage)
+        self.assertIn("readStringUntil", storage)
         self.assertIn("clear()", storage)
         self.assertIn("FFat.remove", storage)
         self.assertIn("const String& label", storage)
         self.assertIn('file.print(F("Titel: "))', storage)
         self.assertIn("Senden und Einlesen", firmware)
+
+    def test_dashboard_separates_send_and_capture_workspaces(self):
+        dashboard = read_text(
+            "firmware/esp32_s3_universal_ir_remote/web_dashboard/WebDashboard.h"
+        )
+
+        for expected in (
+            "id='sendWorkspace'",
+            "id='captureWorkspace'",
+            "id='captureList'",
+            "refreshCaptureList",
+            "deleteCapture",
+            "clearAllCaptures",
+            "setHidden(document.getElementById('sendWorkspace'),activeMode!=='send')",
+            "setHidden(document.getElementById('captureWorkspace'),activeMode!=='capture')",
+            "fetch('/captures/list')",
+            "fetch('/captures/delete?index='+index",
+            "Alle Captures loeschen",
+        ):
+            self.assertIn(expected, dashboard)
 
     def test_dashboard_has_filterable_testing_ui(self):
         dashboard = read_text(

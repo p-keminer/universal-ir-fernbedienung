@@ -21,7 +21,10 @@ Neue Bedienung im Dashboard:
 - Button `Einlesen`
 - Freies Textfeld `Capture-Titel`
 - Button `Titel setzen`
-- Bereich `Letzter Empfang`
+- Getrennter Arbeitsbereich fuer `Senden`
+- Getrennter Arbeitsbereich fuer `Einlesen`
+- Scrollbare Liste aller gespeicherten Captures
+- Einzel-Loeschbutton pro Capture
 - Download-Link fuer `/captures/download`
 - Loesch-Button fuer `/captures/clear`
 
@@ -33,6 +36,8 @@ Neue Routen:
 | `/mode?mode=capture` | Einlesen aktivieren |
 | `/capture/status` | Modus und letzter Capture als JSON |
 | `/capture/label` | frei eingetragenen Capture-Titel setzen |
+| `/captures/list` | gespeicherte Captures als JSON-Liste |
+| `/captures/delete?index=N` | einzelnen Capture loeschen |
 | `/captures/download` | Capture-Log herunterladen |
 | `/captures/clear` | Capture-Log nach Bestaetigung loeschen |
 
