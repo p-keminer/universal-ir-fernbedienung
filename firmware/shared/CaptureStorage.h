@@ -60,6 +60,32 @@ class CaptureStorage {
     return true;
   }
 
+  template <typename ServerT>
+  bool appendDownloadTo(ServerT& server) {
+    server.sendHeader("Content-Disposition",
+                      "attachment; filename=\"ir_captures.log\"");
+
+    if (!mounted_) {
+      server.send(500, "text/plain", "FFat nicht bereit.\n");
+      return false;
+    }
+
+    if (!FFat.exists(kCaptureLogPath)) {
+      server.send(200, "text/plain", "Noch keine Captures gespeichert.\n");
+      return true;
+    }
+
+    File file = FFat.open(kCaptureLogPath, FILE_READ);
+    if (!file) {
+      server.send(500, "text/plain",
+                  "Capture-Log konnte nicht geoeffnet werden.\n");
+      return false;
+    }
+
+    server.streamFile(file, "text/plain");
+    return true;
+  }
+
  private:
   bool mounted_ = false;
 };

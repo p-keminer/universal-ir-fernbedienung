@@ -119,11 +119,55 @@ class WebDashboardDirectionTest(unittest.TestCase):
             "handleRoot",
             "handleSend",
             "handleSweep",
+            "handleMode",
+            "handleCaptureStatus",
+            "handleCaptureDownload",
             '"/"',
             '"/send"',
             '"/sweep"',
+            '"/mode"',
+            '"/capture/status"',
+            '"/captures/download"',
         ):
             self.assertIn(expected, dashboard)
+
+    def test_main_sketch_integrates_send_and_capture_modes(self):
+        sketch = read_text(
+            "firmware/esp32_s3_universal_ir_remote/"
+            "esp32_s3_universal_ir_remote.ino"
+        )
+        config = read_text(
+            "firmware/esp32_s3_universal_ir_remote/config/Config.h"
+        )
+        receiver = read_text(
+            "firmware/esp32_s3_universal_ir_remote/ir_receiver/IrReceiver.h"
+        )
+        dashboard = read_text(
+            "firmware/esp32_s3_universal_ir_remote/web_dashboard/WebDashboard.h"
+        )
+        storage = read_text("firmware/shared/CaptureStorage.h")
+        firmware = read_text("firmware/esp32_s3_universal_ir_remote/README.md")
+
+        self.assertIn("enum class OperationMode", receiver)
+        self.assertIn("OperationMode::Send", receiver)
+        self.assertIn("OperationMode::Capture", receiver)
+        self.assertIn("constexpr uint16_t kIrRecvPin = 15", config)
+        self.assertIn("IRrecv irrecv_", receiver)
+        self.assertIn("setMode", receiver)
+        self.assertIn("latestCaptureSummary", receiver)
+        self.assertIn("captureStorage_", receiver)
+        self.assertIn("captureReceiver.begin()", sketch)
+        self.assertIn("captureReceiver.update()", sketch)
+        self.assertIn("RemoteWebDashboard dashboard(irSender, captureReceiver)", sketch)
+        self.assertIn("mode=send", dashboard)
+        self.assertIn("mode=capture", dashboard)
+        self.assertIn("id='modeSend'", dashboard)
+        self.assertIn("id='modeCapture'", dashboard)
+        self.assertIn("id='captureLatest'", dashboard)
+        self.assertIn("refreshCaptureStatus", dashboard)
+        self.assertIn("download", dashboard)
+        self.assertIn("appendDownloadTo", storage)
+        self.assertIn("Senden und Einlesen", firmware)
 
     def test_dashboard_has_filterable_testing_ui(self):
         dashboard = read_text(

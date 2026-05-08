@@ -24,6 +24,7 @@ jobs:
           test -f firmware/esp32_s3_universal_ir_remote/esp32_s3_universal_ir_remote.ino
           test -f firmware/esp32_s3_universal_ir_remote/config/Config.h
           test -f firmware/esp32_s3_universal_ir_remote/ir_catalog/IrCatalog.h
+          test -f firmware/esp32_s3_universal_ir_remote/ir_receiver/IrReceiver.h
           test -f firmware/esp32_s3_universal_ir_remote/ir_sender/IrSender.h
           test -f firmware/esp32_s3_universal_ir_remote/web_dashboard/WebDashboard.h
           test -f hardware/electronics/SCHEMATIC_CURRENT.md

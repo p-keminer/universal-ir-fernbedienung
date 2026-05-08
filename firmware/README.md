@@ -12,7 +12,8 @@ Der aktive Sketch liegt in:
 esp32_s3_universal_ir_remote/
 ```
 
-Der Capture-Sketch zum Einfangen echter Fernbedienungscodes liegt in:
+Der aktive Web-Sketch kann im Dashboard zwischen Senden und Einlesen wechseln.
+Der separate Capture-Sketch zum Einfangen echter Fernbedienungscodes bleibt als Diagnosewerkzeug im Repo:
 
 ```text
 ir_code_capture/
@@ -28,12 +29,13 @@ Er nutzt:
 
 - `config/` fuer IR-, WLAN- und Webserver-Defaults
 - `ir_catalog/` fuer Profile, Codes und Teststatus
+- `ir_receiver/` fuer Einlese-Modus, FFat-Logging und letzten Capture
 - `ir_sender/` fuer `IRremoteESP8266`-Sendekapselung
 - `web_dashboard/` fuer ESP32-Hotspot, HTTP-Routen und HTML-Dashboard
 - `../shared/` fuer interne RGB-Status-LED und Capture-Speicher
 
-Der Capture-Sketch nutzt `GPIO15` als IR-Empfaenger-Eingang fuer `KY-022`, `VS1838B` oder kompatible 38-kHz-Receiver.
-Captures werden zusaetzlich ueber Serial ausgegeben und in der internen `FFat`-Partition unter `/ir_captures.log` gespeichert.
+Der Web-Sketch und der Capture-Sketch nutzen `GPIO15` als IR-Empfaenger-Eingang fuer `KY-022`, `VS1838B` oder kompatible 38-kHz-Receiver.
+Captures werden ueber Serial ausgegeben, im Dashboard angezeigt und in der internen `FFat`-Partition unter `/ir_captures.log` gespeichert.
 
 ## RGB-Status
 

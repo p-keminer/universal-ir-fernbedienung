@@ -17,12 +17,15 @@ Der Sketch:
 
 1. startet Serial mit `115200`
 2. initialisiert den IR-Sender auf `GPIO4`
-3. startet den Access Point `IR-Remote`
-4. stellt das Dashboard unter `http://192.168.4.1` bereit
-5. zeigt nach Kategorieauswahl erst passende Marken/Profile
-6. oeffnet danach eine fernbedienungsartige Tastenansicht pro Profil
-7. sendet den gewaehlten IR-Befehl ueber `/send`, ohne die Auswahlansicht zu verlassen
-8. bietet den Diagnostic Sweep nur manuell und mit Browser-Bestaetigung ueber `/sweep` an
+3. initialisiert den IR-Empfaenger auf `GPIO15`
+4. startet den Access Point `IR-Remote`
+5. stellt das Dashboard unter `http://192.168.4.1` bereit
+6. wechselt im Dashboard zwischen `Senden` und `Einlesen`
+7. zeigt nach Kategorieauswahl erst passende Marken/Profile
+8. oeffnet danach eine fernbedienungsartige Tastenansicht pro Profil
+9. sendet den gewaehlten IR-Befehl ueber `/send`, ohne die Auswahlansicht zu verlassen
+10. schreibt empfangene IR-Codes seriell und in `/ir_captures.log`
+11. bietet den Diagnostic Sweep nur manuell und mit Browser-Bestaetigung ueber `/sweep` an
 
 Die alte automatische Dauerschleife ist entfernt.
 Taster, Joystick und LCD1602 sind nicht Teil des v1-Defaults.
@@ -54,6 +57,20 @@ Taster, Joystick und LCD1602 sind nicht Teil des v1-Defaults.
 | `/` | Dashboard mit Profilen und Befehlen |
 | `/send?profile=N&command=M` | einzelnen Befehl senden |
 | `/sweep` | manuelle Diagnostic-Sweep-Sequenz senden |
+| `/mode?mode=send` | State Machine auf Senden stellen |
+| `/mode?mode=capture` | State Machine auf Einlesen stellen |
+| `/capture/status` | aktueller Modus und letzter Capture als JSON |
+| `/captures/download` | gespeicherte Captures als Textdatei herunterladen |
+
+## Senden und Einlesen
+
+Der Hauptsketch kann beide Betriebsarten ohne erneutes Flashen:
+
+- `Senden`: IR-Buttons und Diagnostic Sweep sind aktiv.
+- `Einlesen`: IR-Empfaenger ist aktiv, Senden wird blockiert.
+- Der letzte empfangene Code erscheint im Dashboard im Bereich `Letzter Empfang`.
+- Alle Captures werden in der internen `FFat`-Datei `/ir_captures.log` gesammelt.
+- Die Datei kann ueber `Download` im Dashboard heruntergeladen werden.
 
 ## Naechste Firmware-Schritte
 
