@@ -54,3 +54,6 @@ jobs:
 
       - name: Compile IR capture firmware
         run: arduino-cli compile --fqbn esp32:esp32:robotic_arm_s3n16r8 firmware/ir_code_capture
+
+      - name: Compile IR capture dump firmware
+        run: arduino-cli compile --fqbn esp32:esp32:robotic_arm_s3n16r8 firmware/ir_capture_dump

@@ -4,6 +4,7 @@
 #include <IRremoteESP8266.h>
 #include <IRsend.h>
 
+#include "../shared/StatusLed.h"
 #include "../config/Config.h"
 #include "../ir_catalog/IrCatalog.h"
 
@@ -11,7 +12,8 @@ namespace ir_sender {
 
 class UniversalIrSender {
  public:
-  UniversalIrSender() : irsend_(config::kIrLedPin) {}
+  explicit UniversalIrSender(status_led::StatusLed* statusLed = nullptr)
+      : irsend_(config::kIrLedPin), statusLed_(statusLed) {}
 
   void begin() {
     irsend_.begin();
@@ -27,35 +29,59 @@ class UniversalIrSender {
     Serial.print(F(" data=0x"));
     Serial.println(static_cast<unsigned long>(command.data), HEX);
 
+    if (statusLed_ != nullptr) {
+      statusLed_->showSending();
+    }
+
+    bool sent = false;
     switch (command.protocol) {
       case ir_catalog::IrProtocol::Samsung:
         irsend_.sendSAMSUNG(command.data, command.bits);
-        return true;
+        sent = true;
+        break;
       case ir_catalog::IrProtocol::Nec:
         irsend_.sendNEC(command.data, command.bits);
-        return true;
+        sent = true;
+        break;
       case ir_catalog::IrProtocol::Sony:
         irsend_.sendSony(command.data, command.bits);
-        return true;
+        sent = true;
+        break;
       case ir_catalog::IrProtocol::Panasonic:
         irsend_.sendPanasonic(command.address,
                               static_cast<uint32_t>(command.data));
-        return true;
+        sent = true;
+        break;
       case ir_catalog::IrProtocol::Rc5:
         irsend_.sendRC5(command.data, command.bits);
-        return true;
+        sent = true;
+        break;
       case ir_catalog::IrProtocol::Jvc:
         irsend_.sendJVC(command.data, command.bits);
-        return true;
+        sent = true;
+        break;
       case ir_catalog::IrProtocol::SharpRaw:
         irsend_.sendSharpRaw(command.data, command.bits);
-        return true;
+        sent = true;
+        break;
       case ir_catalog::IrProtocol::Epson:
         irsend_.sendEpson(command.data, command.bits);
-        return true;
+        sent = true;
+        break;
       default:
-        return false;
+        sent = false;
+        break;
     }
+
+    if (statusLed_ != nullptr) {
+      if (sent) {
+        statusLed_->showSendOk();
+      } else {
+        statusLed_->showStorageError();
+      }
+    }
+
+    return sent;
   }
 
   bool sendDiagnosticSweep() {
@@ -79,6 +105,7 @@ class UniversalIrSender {
 
  private:
   IRsend irsend_;
+  status_led::StatusLed* statusLed_;
 };
 
 }  // namespace ir_sender

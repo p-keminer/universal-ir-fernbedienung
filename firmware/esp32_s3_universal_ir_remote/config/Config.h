@@ -2,12 +2,15 @@
 
 #include <Arduino.h>
 
+#include "../shared/StatusLed.h"
+
 namespace config {
 
 constexpr uint32_t kSerialBaud = 115200;
 constexpr uint16_t kBootDelayMs = 200;
 
 constexpr uint16_t kIrLedPin = 4;
+constexpr uint16_t kRgbLedPin = status_led::kRgbLedPin;
 constexpr uint16_t kCommandGapMs = 200;
 constexpr uint16_t kPostSendStatusMs = 700;
 

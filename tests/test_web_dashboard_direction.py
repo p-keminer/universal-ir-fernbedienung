@@ -67,6 +67,47 @@ class WebDashboardDirectionTest(unittest.TestCase):
         self.assertIn("S/OUT -> GPIO15", receiver)
         self.assertIn("Eigene Captures", research)
 
+    def test_rgb_status_led_and_capture_storage_are_defined(self):
+        workflow = read_text(".github/workflows/repo-smoke.yml")
+        shared_led = read_text("firmware/shared/StatusLed.h")
+        storage = read_text("firmware/shared/CaptureStorage.h")
+        main_config = read_text(
+            "firmware/esp32_s3_universal_ir_remote/config/Config.h"
+        )
+        sender = read_text(
+            "firmware/esp32_s3_universal_ir_remote/ir_sender/IrSender.h"
+        )
+        capture = read_text("firmware/ir_code_capture/ir_code_capture.ino")
+        dump = read_text("firmware/ir_capture_dump/ir_capture_dump.ino")
+        firmware = read_text("firmware/README.md")
+        hardware = read_text("hardware/electronics/INTERNAL_RGB_STATUS.md")
+
+        self.assertIn("kRgbLedPin = 48", shared_led)
+        self.assertIn("rgbLedWrite(pin_", shared_led)
+        self.assertIn("showSending()", shared_led)
+        self.assertIn("showReceiveOk()", shared_led)
+        self.assertIn("kSendColor = {96, 32, 0}", shared_led)
+        self.assertIn("kReceiveOkColor = {0, 48, 64}", shared_led)
+        self.assertIn("kStorageErrorColor = {96, 0, 0}", shared_led)
+        self.assertIn("kRgbLedPin = status_led::kRgbLedPin", main_config)
+        self.assertIn("StatusLed* statusLed_", sender)
+        self.assertIn("showSending()", sender)
+        self.assertIn("showSendOk()", sender)
+        self.assertIn("#include <FFat.h>", storage)
+        self.assertIn('kCaptureLogPath = "/ir_captures.log"', storage)
+        self.assertIn("FILE_APPEND", storage)
+        self.assertIn("captureStorage.append", capture)
+        self.assertIn("statusLed.showReceiveOk()", capture)
+        self.assertIn("Serial.print", capture)
+        self.assertIn("captureStorage.printTo(Serial)", dump)
+        self.assertIn("firmware/ir_capture_dump", workflow)
+        self.assertIn("GPIO48", firmware)
+        self.assertIn("Orange", firmware)
+        self.assertIn("Cyan", firmware)
+        self.assertIn("FFat", firmware)
+        self.assertIn("GPIO48", hardware)
+        self.assertIn("Empfangen erfolgreich", hardware)
+
     def test_web_dashboard_module_exposes_expected_routes(self):
         dashboard = read_text(
             "firmware/esp32_s3_universal_ir_remote/web_dashboard/WebDashboard.h"

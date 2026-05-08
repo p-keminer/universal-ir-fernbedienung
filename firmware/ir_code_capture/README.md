@@ -41,3 +41,12 @@ Der Port kann lokal abweichen.
 6. Drei Captures pro Taste vergleichen.
 
 Nur wiederholbare Captures werden in den aktiven Katalog uebernommen.
+
+## Speicher und RGB
+
+- Serial gibt jeden Capture sofort mit `Protocol`, `Code`, `Bits` und Source-Code aus.
+- Zusaetzlich wird jeder Capture intern in der `FFat`-Partition unter `/ir_captures.log` gespeichert.
+- Die interne RGB-LED auf `GPIO48` blinkt Cyan, wenn der Capture empfangen und gespeichert wurde.
+- Rot bedeutet: Capture wurde zwar erkannt, konnte aber nicht gespeichert werden.
+
+Zum Auslesen des internen Logs gibt es den Sketch `firmware/ir_capture_dump`.

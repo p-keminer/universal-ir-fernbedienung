@@ -8,6 +8,8 @@ Dieser Ordner beschreibt den elektronischen Aufbau der IR-Web-Fernbedienung.
 
 - `SCHEMATIC_CURRENT.md` beschreibt den aktiven Minimalstand im ASCII-Stil.
 - `IR_DRIVER_CONCEPT.md` beschreibt den NPN-Treiber fuer das KY-005/IR-LED-Modul.
+- `IR_RECEIVER_CAPTURE.md` beschreibt den temporaeren IR-Empfaenger zum Code-Capturing.
+- `INTERNAL_RGB_STATUS.md` beschreibt GPIO48 und den LED-Farbcode.
 - `PIN_MAPPING_DRAFT.md` sammelt GPIOs und offene Pinentscheidungen.
 - `DATASHEET_NOTES.md` sammelt Quellen und Bauteilhinweise.
 - `INPUT_OPTIONS.md`, `BUTTON_WIRING.md` und `LCD1602_I2C_CHECK.md` bleiben als optionale/future Notizen erhalten.

@@ -18,14 +18,34 @@ Der Capture-Sketch zum Einfangen echter Fernbedienungscodes liegt in:
 ir_code_capture/
 ```
 
+Der Dump-Sketch zum seriellen Auslesen gespeicherter Captures liegt in:
+
+```text
+ir_capture_dump/
+```
+
 Er nutzt:
 
 - `config/` fuer IR-, WLAN- und Webserver-Defaults
 - `ir_catalog/` fuer Profile, Codes und Teststatus
 - `ir_sender/` fuer `IRremoteESP8266`-Sendekapselung
 - `web_dashboard/` fuer ESP32-Hotspot, HTTP-Routen und HTML-Dashboard
+- `../shared/` fuer interne RGB-Status-LED und Capture-Speicher
 
 Der Capture-Sketch nutzt `GPIO15` als IR-Empfaenger-Eingang fuer `KY-022`, `VS1838B` oder kompatible 38-kHz-Receiver.
+Captures werden zusaetzlich ueber Serial ausgegeben und in der internen `FFat`-Partition unter `/ir_captures.log` gespeichert.
+
+## RGB-Status
+
+Die interne RGB-LED sitzt auf `GPIO48`.
+
+| Farbe | Bedeutung |
+| --- | --- |
+| Blau | Boot/Sketch gestartet |
+| Orange | IR-Befehl wird gesendet |
+| Gruen | IR-Senden abgeschlossen |
+| Cyan | Empfangen erfolgreich und Capture gespeichert |
+| Rot | Speicher-/Sendefehler |
 
 Nicht mehr im v1-Default:
 
